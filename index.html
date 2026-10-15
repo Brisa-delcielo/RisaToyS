@@ -3,34 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RisaToys</title>
+    <title>RisaToys — Canasta de Juguetes Digitales</title>
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080810'/><text x='50' y='72' font-family='monospace' font-weight='900' font-size='65' fill='%23ffd000' text-anchor='middle'>R</text></svg>">
 
-    <!-- Tipografías -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Estilos CSS -->
-    <link rel="stylesheet" href="styles.css?v=5">
+    <!-- Se cambió la versión a v=99 para forzar actualización de caché -->
+    <link rel="stylesheet" href="styles.css?v=99">
 
-    <!-- Motores para físicas y audio retro -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 <body>
 
-    <!-- Canvas de Polvo de Estrellas del Fondo -->
     <canvas id="stardust-canvas"></canvas>
-
-    <!-- Contenedor del Simulador de Físicas -->
     <div id="physics-container"></div>
 
     <main class="wrapper">
 
-        <!-- HEADER -->
         <header class="site-header">
             <div class="header-top">
                 <div class="brand-badge">[ CANASTA ESPACIAL DE CÓDIGO ]</div>
@@ -48,10 +41,8 @@
             </div>
         </header>
 
-        <!-- GALERÍA DE PROYECTOS -->
         <section class="toybox-grid">
 
-            <!-- JUGUETE 1 -->
             <article class="toy-card" data-color="yellow">
                 <div class="card-header">
                     <span class="toy-tag">#01 — THREE.JS / 3D</span>
@@ -67,7 +58,6 @@
                 </div>
             </article>
 
-            <!-- JUGUETE 2 -->
             <article class="toy-card" data-color="cyan">
                 <div class="card-header">
                     <span class="toy-tag">#02 — CANVAS 2D / FÍSICA</span>
@@ -83,7 +73,6 @@
                 </div>
             </article>
 
-            <!-- JUGUETE 3 -->
             <article class="toy-card" data-color="pink">
                 <div class="card-header">
                     <span class="toy-tag">#03 — NASA APIS / DATOS</span>
@@ -99,7 +88,6 @@
                 </div>
             </article>
 
-            <!-- JUGUETE 4 -->
             <article class="toy-card disabled" data-color="green">
                 <div class="card-header">
                     <span class="toy-tag">#04 — PRÓXIMAMENTE</span>
@@ -117,16 +105,13 @@
 
         </section>
 
-        <!-- FOOTER -->
         <footer class="site-footer">
             <p>Brisa delCielo</p>
         </footer>
 
     </main>
 
-    <!-- SCRIPT DE INTERACCIONES Y FÍSICAS -->
     <script>
-        // --- 1. SÍNTESIS DE AUDIO RETRO CON TONE.JS ---
         let soundEnabled = true;
         let synth, noiseSynth;
 
@@ -167,7 +152,6 @@
             if (soundEnabled) playBlip(600);
         });
 
-        // --- 2. POLVO DE ESTRELLAS EN CANVAS (MOURSE TRAIL) ---
         const starCanvas = document.getElementById('stardust-canvas');
         const starCtx = starCanvas.getContext('2d');
         let particles = [];
@@ -241,12 +225,10 @@
         }
         animateStardust();
 
-        // --- 3. MOTOR DE FÍSICAS CON MATTER.JS ---
         const Engine = Matter.Engine,
               Render = Matter.Render,
               World = Matter.World,
               Bodies = Matter.Bodies,
-              Composite = Matter.Composite,
               Mouse = Matter.Mouse,
               MouseConstraint = Matter.MouseConstraint;
 
@@ -298,14 +280,13 @@
         Matter.Runner.run(engine);
         Render.run(render);
 
-        // LANZAR JUGUETES
         const colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66'];
         let toys = [];
 
         function spawnToy() {
             playBlip(523.25);
             const x = Math.random() * (window.innerWidth - 200) + 100;
-            const size = Math.floor(Math.random() * 25) + 35;
+            const size = Math.floor(Math.random() * 20) + 25;
             const color = colors[Math.floor(Math.random() * colors.length)];
             const shapes = ['box', 'circle', 'polygon'];
             const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
@@ -317,7 +298,7 @@
                 render: {
                     fillStyle: color,
                     strokeStyle: '#000000',
-                    lineWidth: 4
+                    lineWidth: 3
                 }
             };
 
@@ -341,111 +322,103 @@
             toys = [];
         });
 
-        // --- 4. MINI-CANVASES INTERACTIVOS DENTRO DE LAS TARJETAS ---
-        // Canvas 1: Planeta Giratorio de Píxeles
+        // CANVAS DE TARJETAS CON ANCHO CONTROLADO
         const c1 = document.getElementById('mini-canvas-1');
         const ctx1 = c1.getContext('2d');
         let angle1 = 0;
 
         function drawCanvas1() {
-            c1.width = c1.parentElement.offsetWidth;
-            c1.height = 140;
-            const w = c1.width, h = c1.height;
+            const w = c1.parentElement.clientWidth || 300;
+            c1.width = w;
+            c1.height = 120;
 
             ctx1.fillStyle = '#080810';
-            ctx1.fillRect(0, 0, w, h);
+            ctx1.fillRect(0, 0, w, 120);
 
-            // Anillo
             ctx1.save();
-            ctx1.translate(w/2, h/2);
+            ctx1.translate(w/2, 60);
             ctx1.rotate(0.3);
             ctx1.strokeStyle = '#ffd000';
-            ctx1.lineWidth = 6;
+            ctx1.lineWidth = 4;
             ctx1.beginPath();
-            ctx1.ellipse(0, 0, 50, 15, 0, 0, Math.PI * 2);
+            ctx1.ellipse(0, 0, 40, 12, 0, 0, Math.PI * 2);
             ctx1.stroke();
             ctx1.restore();
 
-            // Esfera
             ctx1.fillStyle = '#ff2a85';
             ctx1.beginPath();
-            ctx1.arc(w/2, h/2, 28, 0, Math.PI * 2);
+            ctx1.arc(w/2, 60, 22, 0, Math.PI * 2);
             ctx1.fill();
-            ctx1.lineWidth = 4;
+            ctx1.lineWidth = 3;
             ctx1.strokeStyle = '#000';
             ctx1.stroke();
 
-            // Píxel detalle
             angle1 += 0.03;
-            const px = w/2 + Math.cos(angle1) * 18;
-            const py = h/2 + Math.sin(angle1) * 8;
+            const px = w/2 + Math.cos(angle1) * 15;
+            const py = 60 + Math.sin(angle1) * 6;
             ctx1.fillStyle = '#ffffff';
-            ctx1.fillRect(px - 3, py - 3, 6, 6);
+            ctx1.fillRect(px - 2, py - 2, 4, 4);
 
             requestAnimationFrame(drawCanvas1);
         }
         drawCanvas1();
 
-        // Canvas 2: Rebote Físico
         const c2 = document.getElementById('mini-canvas-2');
         const ctx2 = c2.getContext('2d');
-        let bx = 50, by = 50, vx = 3, vy = 2;
+        let bx = 40, by = 40, vx = 3, vy = 2;
 
         function drawCanvas2() {
-            c2.width = c2.parentElement.offsetWidth;
-            c2.height = 140;
-            const w = c2.width, h = c2.height;
+            const w = c2.parentElement.clientWidth || 300;
+            c2.width = w;
+            c2.height = 120;
 
             ctx2.fillStyle = '#080810';
-            ctx2.fillRect(0, 0, w, h);
+            ctx2.fillRect(0, 0, w, 120);
 
             bx += vx;
             by += vy;
 
-            if (bx < 20 || bx > w - 20) vx *= -1;
-            if (by < 20 || by > h - 20) vy *= -1;
+            if (bx < 15 || bx > w - 15) vx *= -1;
+            if (by < 15 || by > 105) vy *= -1;
 
             ctx2.fillStyle = '#00f0ff';
-            ctx2.fillRect(bx - 12, by - 12, 24, 24);
+            ctx2.fillRect(bx - 10, by - 10, 20, 20);
             ctx2.strokeStyle = '#000000';
-            ctx2.lineWidth = 4;
-            ctx2.strokeRect(bx - 12, by - 12, 24, 24);
+            ctx2.lineWidth = 3;
+            ctx2.strokeRect(bx - 10, by - 10, 20, 20);
 
             requestAnimationFrame(drawCanvas2);
         }
         drawCanvas2();
 
-        // Canvas 3: Radar Espacial NASA
         const c3 = document.getElementById('mini-canvas-3');
         const ctx3 = c3.getContext('2d');
         let radarAngle = 0;
 
         function drawCanvas3() {
-            c3.width = c3.parentElement.offsetWidth;
-            c3.height = 140;
-            const w = c3.width, h = c3.height;
+            const w = c3.parentElement.clientWidth || 300;
+            c3.width = w;
+            c3.height = 120;
 
             ctx3.fillStyle = '#080810';
-            ctx3.fillRect(0, 0, w, h);
+            ctx3.fillRect(0, 0, w, 120);
 
-            // Círculos de radar
             ctx3.strokeStyle = '#00ff66';
             ctx3.lineWidth = 2;
             ctx3.beginPath();
-            ctx3.arc(w/2, h/2, 45, 0, Math.PI * 2);
-            ctx3.arc(w/2, h/2, 25, 0, Math.PI * 2);
+            ctx3.arc(w/2, 60, 40, 0, Math.PI * 2);
+            ctx3.arc(w/2, 60, 20, 0, Math.PI * 2);
             ctx3.stroke();
 
-            // Aguja radar
             radarAngle += 0.04;
             ctx3.save();
-            ctx3.translate(w/2, h/2);
+            ctx3.translate(w/2, 60);
             ctx3.rotate(radarAngle);
             ctx3.strokeStyle = '#00ff66';
-            ctx3.lineWidth = 3;
+            ctx3.lineWidth = 2;
             ctx3.beginPath();
             ctx3.moveTo(0, 0);
-            ctx3.lineTo(45, 0);
+            ctx3.lineTo(40, 0);
             ctx3.stroke();
             ctx3.restore();
 
@@ -453,13 +426,8 @@
         }
         drawCanvas3();
 
-        // Sonidos en hover de tarjetas
         document.querySelectorAll('.toy-card:not(.disabled)').forEach(card => {
             card.addEventListener('mouseenter', () => playBlip(300));
-        });
-    </script>
-</body>
-</html>
         });
     </script>
 </body>
