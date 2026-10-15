@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brisa</title>
+    <title>Brisa — Canasta de Juguetes Digitales</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='0' fill='%23050505'/><text x='50' y='72' font-family='system-ui, sans-serif' font-weight='900' font-size='70' fill='%23ffffff' text-anchor='middle'>B</text></svg>">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,176 +18,120 @@
 
     <main class="container">
         
+        <!-- HERO: Concepto de Galería/Taller -->
         <section class="hero">
-            <span class="badge-orbit">GALERÍA MULTIDISCIPLINARIA</span>
-            <h1>Exploraciones a través de la <i>imagen</i>, la <i>palabra</i>, el <i>sonido</i> y la <i>lógica</i>.</h1>
+            <span class="badge-orbit">CANASTA DE JUGUETES DIGITALES</span>
+            <h1>Experimentos, <i>simulaciones</i> y artefactos creados con <i>código</i>.</h1>
         </section>
 
+        <!-- MANIFIESTO: Tono juguetón y curioso -->
         <section id="manifiesto" class="manifesto-section">
             <div class="manifesto-card">
-                <p>Un espacio de exploración multidisciplinaria dedicado al estudio de la imagen, la forma sonora, la palabra escrita y los sistemas interactivos. Un registro continuo del proceso creativo y analítico.</p>
+                <p>Una colección personal de herramientas interactivas, motores 3D, físicas en Canvas y visualizaciones de datos. Sin fines corporativos: solo curiosidad, código y ganas de construir cosas que funcionen en el navegador.</p>
             </div>
         </section>
 
-        <section id="bloque-artistico" class="projects-section">
+        <!-- BLOQUE 1: SIMULACIONES & CANVAS 3D/2D -->
+        <section id="bloque-simulaciones" class="projects-section">
             <div class="block-header">
-                <h2>CREACIÓN & EXPRESIÓN</h2>
-                <p class="block-desc">Obra visual, narrativa y piezas sonoras.</p>
+                <h2 style="letter-spacing: 0.05em;">FÍSICA, CANVAS & 3D</h2>
+                <p class="block-desc">Juguetes gráficos y sistemas interactivos para explorar.</p>
             </div>
 
             <div class="projects-grid">
 
                 <article class="project-card">
-                    <div class="card-tag">ILUSTRACIÓN & ARTE VISUAL</div>
-                    <h3>OBRAS VISUALES</h3>
-                    <p>Ilustraciones, gráficos digitales y piezas conceptuales.</p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">ESTADO</span>
-                        <p>En proceso de digitalización.</p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>TINTA</span>
-                        <span>DIGITAL</span>
-                        <span>ILUSTRACIÓN</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <span class="btn outline disabled">PRÓXIMAMENTE ↗</span>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="card-tag">LITERATURA</div>
-                    <h3>PROSA & NARRATIVA</h3>
-                    <p>Textos y poemas.</p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">FRAGMENTO</span>
-                        <p><i>Selección de textos.</i></p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>NARRATIVA</span>
-                        <span>POESÍA</span>
-                        <span>EDITORIAL</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="#" class="btn primary">LEER ESCRITO ↗</a>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="card-tag">MÚSICA & COMPOSICIÓN</div>
-                    <h3>PROYECTO SONORO</h3>
-                    <p><i>Música y piezas audiovisuales.</i></p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">PRODUCCIÓN</span>
-                        <p><i>Música y producción vocal.</i></p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>COMPOSICIÓN</span>
-                        <span>AUDIOVISUAL</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="https://youtube.com" target="_blank" class="btn primary">VER EN YOUTUBE ↗</a>
-                    </div>
-                </article>
-
-            </div>
-        </section>
-
-        <section id="bloque-analitico" class="projects-section">
-            <div class="block-header">
-                <h2>ANÁLISIS & SISTEMAS</h2>
-                <p class="block-desc">Simulaciones, investigación y desarrollo interactivo.</p>
-            </div>
-
-            <div class="projects-grid">
-
-                <article class="project-card">
-                    <div class="card-tag">INVESTIGACIÓN CIENTÍFICA</div>
-                    <h3>ESTUDIO & MANUSCRITO</h3>
-                    <p><i>Investigación y análisis teórico-experimentales.</i></p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">SÍNTESIS</span>
-                        <p>Resumen de hipótesis, metodología y conclusiones.</p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>ACADÉMICO</span>
-                        <span>ANÁLISIS DE DATOS</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="#" class="btn primary">LEER ↗</a>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="card-tag">INTERACCIÓN 3D AEROESPACIAL</div>
+                    <div class="card-tag">MOTOR 3D / THREE.JS</div>
                     <h3>VALKYRIE-9</h3>
-                    <p><i>Visor 3D interactivo de una nave espacial.</i></p>
+                    <p>Visor tridimensional interactivo para orbitar e inspeccionar una nave espacial en tiempo real.</p>
 
                     <div class="field-notes">
-                        <span class="notes-label">TÉCNICA</span>
-                        <p><i>Renderizado tridimensional e interfaz de control.</i></p>
+                        <span class="notes-label">EXPERIMENTO</span>
+                        <p>Renderizado de mallas 3D, iluminación espacial e interfaz HUD.</p>
                     </div>
                     
                     <div class="tech-stack">
                         <span>THREE.JS</span>
-                        <span>CANVAS</span>
-                        <span>3D</span>
+                        <span>WEBGL</span>
+                        <span>3D INTERACTIVO</span>
                     </div>
 
                     <div class="card-actions">
-                        <a href="https://brisa-delcielo.github.io/valkyrie" target="_blank" class="btn primary">EXPLORAR ↗</a>
+                        <a href="https://brisa-delcielo.github.io/valkyrie" target="_blank" class="btn primary">PROBAR JUGUETE ↗</a>
                     </div>
                 </article>
 
                 <article class="project-card">
-                    <div class="card-tag">INTERFAZ HUD & SIMULACIÓN</div>
+                    <div class="card-tag">FÍSICA 2D / CANVAS</div>
                     <h3>APEX</h3>
-                    <p><i>Simulador mecánico interactivo.</i></p>
+                    <p>Simulador mecánico con detección de colisiones y física simulada en 2D.</p>
 
                     <div class="field-notes">
-                        <span class="notes-label">TÉCNICA</span>
-                        <p><i>Animación y física simulada.</i></p>
+                        <span class="notes-label">EXPERIMENTO</span>
+                        <p>Matemáticas de vectores, gravedad personalizada y renderizado en Canvas.</p>
                     </div>
                     
                     <div class="tech-stack">
                         <span>CANVAS 2D</span>
-                        <span>FÍSICA</span>
+                        <span>FÍSICA JS</span>
+                        <span>ANIMACIÓN</span>
                     </div>
 
                     <div class="card-actions">
-                        <a href="https://brisa-delcielo.github.io/apex/" target="_blank" class="btn primary">EXPLORAR ↗</a>
+                        <a href="https://brisa-delcielo.github.io/apex/" target="_blank" class="btn primary">PROBAR JUGUETE ↗</a>
                     </div>
                 </article>
 
+            </div>
+        </section>
+
+        <!-- BLOQUE 2: DASHBOARDS & APIS -->
+        <section id="bloque-datos" class="projects-section">
+            <div class="block-header">
+                <h2 style="letter-spacing: 0.05em;">SISTEMAS & DATOS EN VIVO</h2>
+                <p class="block-desc">Paneles interactivos y consumo de APIs de exploración.</p>
+            </div>
+
+            <div class="projects-grid">
+
                 <article class="project-card">
-                    <div class="card-tag">APIS & DASHBOARD</div>
+                    <div class="card-tag">NASA API / DASHBOARD</div>
                     <h3>MISIÓN</h3>
-                    <p>Dashboard interactivo con datos de la NASA en tiempo real.</p>
+                    <p>Monitor de eventos astronómicos y rastreador de asteroides cercanos en tiempo real.</p>
 
                     <div class="field-notes">
-                        <span class="notes-label">TÉCNICA</span>
-                        <p><i>Visualización de eventos espaciales y asteroides.</i></p>
+                        <span class="notes-label">EXPERIMENTO</span>
+                        <p>Consumo de APIs públicas, procesamiento de datos y maquetación tipo panel de control.</p>
                     </div>
                     
                     <div class="tech-stack">
                         <span>NASA APIS</span>
+                        <span>ASYNC JS</span>
                         <span>DASHBOARD</span>
                     </div>
 
                     <div class="card-actions">
-                        <a href="https://brisa-delcielo.github.io/mision/" target="_blank" class="btn primary">EXPLORAR ↗</a>
+                        <a href="https://brisa-delcielo.github.io/mision/" target="_blank" class="btn primary">ABRIR DASHBOARD ↗</a>
+                    </div>
+                </article>
+
+                <article class="project-card">
+                    <div class="card-tag">PRÓXIMO EXPERIMENTO</div>
+                    <h3>[ PRÓXIMO JUGUETE ]</h3>
+                    <p>Un nuevo experimento en código se está cocinando en el taller.</p>
+
+                    <div class="field-notes">
+                        <span class="notes-label">ESTADO</span>
+                        <p>Escribiendo funciones y ajustando parámetros.</p>
+                    </div>
+                    
+                    <div class="tech-stack">
+                        <span>CÓDIGO</span>
+                        <span>LABORATORIO</span>
+                    </div>
+
+                    <div class="card-actions">
+                        <span class="btn outline disabled">EN CONSTRUCCIÓN ↗</span>
                     </div>
                 </article>
 
@@ -197,9 +141,10 @@
     </main>
 
     <footer>
-        <p>© 2026 Brisa</p>
+        <p>© 2026 Brisa — Taller de Código</p>
     </footer>
 
+    <!-- TU SCRIPT DE PARTÍCULAS SE MANTIENE IGUAL -->
     <script>
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
@@ -285,7 +230,6 @@
                         render();
                     }
                 });
-                
             }
         });
     </script>
