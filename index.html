@@ -3,234 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brisa — Canasta de Juguetes Digitales</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='0' fill='%23050505'/><text x='50' y='72' font-family='system-ui, sans-serif' font-weight='900' font-size='70' fill='%23ffffff' text-anchor='middle'>B</text></svg>">
+    <title>RisaToys — Canasta de Juguetes Digitales</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080810'/><text x='50' y='72' font-family='monospace' font-weight='900' font-size='65' fill='%23ffd000' text-anchor='middle'>R</text></svg>">
 
+    <!-- Tipografías -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..500&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="styles.css?v=3">
+    <!-- Estilos CSS -->
+    <link rel="stylesheet" href="styles.css?v=5">
+
+    <!-- Motores para físicas y audio retro -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 <body>
 
-    <div class="jupiter-background"></div>
+    <!-- Canvas de Polvo de Estrellas del Fondo -->
+    <canvas id="stardust-canvas"></canvas>
 
-    <main class="container">
-        
-        <!-- HERO: Concepto de Galería/Taller -->
-        <section class="hero">
-            <span class="badge-orbit">CANASTA DE JUGUETES DIGITALES</span>
-            <h1>Experimentos, <i>simulaciones</i> y artefactos creados con <i>código</i>.</h1>
+    <!-- Contenedor del Simulador de Físicas -->
+    <div id="physics-container"></div>
+
+    <main class="wrapper">
+
+        <!-- HEADER -->
+        <header class="site-header">
+            <div class="header-top">
+                <div class="brand-badge">[ CANASTA ESPACIAL DE CÓDIGO ]</div>
+                <button id="sound-toggle" class="btn-retro">
+                    <span id="sound-icon">🔊</span> AUDIO: ON
+                </button>
+            </div>
+            
+            <h1 class="glitch-title">RisaToys</h1>
+            <p class="hero-desc">Un patio de juegos digital con físicas, polvo de estrellas, gráficos 2D/3D y simulaciones interactivas creadas con código.</p>
+
+            <div class="toybox-controls">
+                <button id="spawn-toy-btn" class="btn-action spawn-btn">¡TIRAR JUGUETE AL SUELO! 🪐</button>
+                <button id="clear-toys-btn" class="btn-action clear-btn">LIMPIAR MESA 🧹</button>
+            </div>
+        </header>
+
+        <!-- GALERÍA DE PROYECTOS -->
+        <section class="toybox-grid">
+
+            <!-- JUGUETE 1 -->
+            <article class="toy-card" data-color="yellow">
+                <div class="card-header">
+                    <span class="toy-tag">#01 — THREE.JS / 3D</span>
+                    <span class="toy-badge">EN VIVO</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="mini-canvas-1"></canvas>
+                </div>
+                <h2>VALKYRIE-9</h2>
+                <p>Visor tridimensional interactivo de una nave espacial en órbita con controles de cámara.</p>
+                <div class="card-actions">
+                    <a href="https://brisa-delcielo.github.io/valkyrie" target="_blank" class="toy-link primary">JUGAR AHORA ↗</a>
+                </div>
+            </article>
+
+            <!-- JUGUETE 2 -->
+            <article class="toy-card" data-color="cyan">
+                <div class="card-header">
+                    <span class="toy-tag">#02 — CANVAS 2D / FÍSICA</span>
+                    <span class="toy-badge">EN VIVO</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="mini-canvas-2"></canvas>
+                </div>
+                <h2>APEX</h2>
+                <p>Simulador mecánico interactivo con partículas, rebotes y detección de colisiones.</p>
+                <div class="card-actions">
+                    <a href="https://brisa-delcielo.github.io/apex/" target="_blank" class="toy-link primary">JUGAR AHORA ↗</a>
+                </div>
+            </article>
+
+            <!-- JUGUETE 3 -->
+            <article class="toy-card" data-color="pink">
+                <div class="card-header">
+                    <span class="toy-tag">#03 — NASA APIS / DATOS</span>
+                    <span class="toy-badge">EN VIVO</span>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="mini-canvas-3"></canvas>
+                </div>
+                <h2>MISIÓN</h2>
+                <p>Dashboard de eventos espaciales y rastreo de asteroides cercanos consumiendo datos reales.</p>
+                <div class="card-actions">
+                    <a href="https://brisa-delcielo.github.io/mision/" target="_blank" class="toy-link primary">JUGAR AHORA ↗</a>
+                </div>
+            </article>
+
+            <!-- JUGUETE 4 -->
+            <article class="toy-card disabled" data-color="green">
+                <div class="card-header">
+                    <span class="toy-tag">#04 — PRÓXIMAMENTE</span>
+                    <span class="toy-badge outline">EN CONSTRUCCIÓN</span>
+                </div>
+                <div class="canvas-container placeholder-canvas">
+                    <div class="construction-icon">👾</div>
+                </div>
+                <h2>[ EXPERIMENTO 04 ]</h2>
+                <p>Cocinando un nuevo prototipo interactivo en el laboratorio de código.</p>
+                <div class="card-actions">
+                    <span class="toy-link disabled">PRÓXIMAMENTE</span>
+                </div>
+            </article>
+
         </section>
 
-        <!-- MANIFIESTO: Tono juguetón y curioso -->
-        <section id="manifiesto" class="manifesto-section">
-            <div class="manifesto-card">
-                <p>Una colección personal de herramientas interactivas, motores 3D, físicas en Canvas y visualizaciones de datos. Sin fines corporativos: solo curiosidad, código y ganas de construir cosas que funcionen en el navegador.</p>
-            </div>
-        </section>
-
-        <!-- BLOQUE 1: SIMULACIONES & CANVAS 3D/2D -->
-        <section id="bloque-simulaciones" class="projects-section">
-            <div class="block-header">
-                <h2 style="letter-spacing: 0.05em;">FÍSICA, CANVAS & 3D</h2>
-                <p class="block-desc">Juguetes gráficos y sistemas interactivos para explorar.</p>
-            </div>
-
-            <div class="projects-grid">
-
-                <article class="project-card">
-                    <div class="card-tag">MOTOR 3D / THREE.JS</div>
-                    <h3>VALKYRIE-9</h3>
-                    <p>Visor tridimensional interactivo para orbitar e inspeccionar una nave espacial en tiempo real.</p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">EXPERIMENTO</span>
-                        <p>Renderizado de mallas 3D, iluminación espacial e interfaz HUD.</p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>THREE.JS</span>
-                        <span>WEBGL</span>
-                        <span>3D INTERACTIVO</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="https://brisa-delcielo.github.io/valkyrie" target="_blank" class="btn primary">PROBAR JUGUETE ↗</a>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="card-tag">FÍSICA 2D / CANVAS</div>
-                    <h3>APEX</h3>
-                    <p>Simulador mecánico con detección de colisiones y física simulada en 2D.</p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">EXPERIMENTO</span>
-                        <p>Matemáticas de vectores, gravedad personalizada y renderizado en Canvas.</p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>CANVAS 2D</span>
-                        <span>FÍSICA JS</span>
-                        <span>ANIMACIÓN</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="https://brisa-delcielo.github.io/apex/" target="_blank" class="btn primary">PROBAR JUGUETE ↗</a>
-                    </div>
-                </article>
-
-            </div>
-        </section>
-
-        <!-- BLOQUE 2: DASHBOARDS & APIS -->
-        <section id="bloque-datos" class="projects-section">
-            <div class="block-header">
-                <h2 style="letter-spacing: 0.05em;">SISTEMAS & DATOS EN VIVO</h2>
-                <p class="block-desc">Paneles interactivos y consumo de APIs de exploración.</p>
-            </div>
-
-            <div class="projects-grid">
-
-                <article class="project-card">
-                    <div class="card-tag">NASA API / DASHBOARD</div>
-                    <h3>MISIÓN</h3>
-                    <p>Monitor de eventos astronómicos y rastreador de asteroides cercanos en tiempo real.</p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">EXPERIMENTO</span>
-                        <p>Consumo de APIs públicas, procesamiento de datos y maquetación tipo panel de control.</p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>NASA APIS</span>
-                        <span>ASYNC JS</span>
-                        <span>DASHBOARD</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <a href="https://brisa-delcielo.github.io/mision/" target="_blank" class="btn primary">ABRIR DASHBOARD ↗</a>
-                    </div>
-                </article>
-
-                <article class="project-card">
-                    <div class="card-tag">PRÓXIMO EXPERIMENTO</div>
-                    <h3>[ PRÓXIMO JUGUETE ]</h3>
-                    <p>Un nuevo experimento en código se está cocinando en el taller.</p>
-
-                    <div class="field-notes">
-                        <span class="notes-label">ESTADO</span>
-                        <p>Escribiendo funciones y ajustando parámetros.</p>
-                    </div>
-                    
-                    <div class="tech-stack">
-                        <span>CÓDIGO</span>
-                        <span>LABORATORIO</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <span class="btn outline disabled">EN CONSTRUCCIÓN ↗</span>
-                    </div>
-                </article>
-
-            </div>
-        </section>
+        <!-- FOOTER -->
+        <footer class="site-footer">
+            <p>Brisa delCielo</p>
+        </footer>
 
     </main>
 
-    <footer>
-        <p>© 2026 Brisa — Taller de Código</p>
-    </footer>
-
-    <!-- TU SCRIPT DE PARTÍCULAS SE MANTIENE IGUAL -->
+    <!-- SCRIPT DE INTERACCIONES Y FÍSICAS -->
     <script>
-        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        // --- 1. SÍNTESIS DE AUDIO RETRO CON TONE.JS ---
+        let soundEnabled = true;
+        let synth, noiseSynth;
 
-        document.querySelectorAll('.project-card').forEach(card => {
-            const canvas = document.createElement('canvas');
-            canvas.classList.add('card-particles');
-            card.appendChild(canvas);
+        function initAudio() {
+            if (!synth) {
+                synth = new Tone.Synth({
+                    oscillator: { type: "square" },
+                    envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+                }).toDestination();
+                synth.volume.value = -12;
 
-            const ctx = canvas.getContext('2d');
-            let particles = [];
-            let animId = null;
+                noiseSynth = new Tone.NoiseSynth({
+                    noise: { type: "white" },
+                    envelope: { attack: 0.005, decay: 0.05, sustain: 0 }
+                }).toDestination();
+                noiseSynth.volume.value = -18;
+            }
+        }
 
-            function resizeCanvas() {
-                canvas.width = card.offsetWidth;
-                canvas.height = card.offsetHeight;
+        function playBlip(freq = 440) {
+            if (!soundEnabled) return;
+            initAudio();
+            Tone.start();
+            synth.triggerAttackRelease(freq, "8n");
+        }
+
+        function playPop() {
+            if (!soundEnabled) return;
+            initAudio();
+            Tone.start();
+            noiseSynth.triggerAttackRelease("16n");
+        }
+
+        document.getElementById('sound-toggle').addEventListener('click', () => {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('sound-toggle');
+            btn.innerHTML = soundEnabled ? '<span>🔊</span> AUDIO: ON' : '<span>🔇</span> AUDIO: OFF';
+            if (soundEnabled) playBlip(600);
+        });
+
+        // --- 2. POLVO DE ESTRELLAS EN CANVAS (MOURSE TRAIL) ---
+        const starCanvas = document.getElementById('stardust-canvas');
+        const starCtx = starCanvas.getContext('2d');
+        let particles = [];
+
+        function resizeStarCanvas() {
+            starCanvas.width = window.innerWidth;
+            starCanvas.height = window.innerHeight;
+        }
+        resizeStarCanvas();
+        window.addEventListener('resize', resizeStarCanvas);
+
+        class StardustParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.floor(Math.random() * 8) + 4;
+                this.vx = (Math.random() - 0.5) * 3;
+                this.vy = (Math.random() - 0.5) * 3 - 1;
+                this.colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66', '#ffffff'];
+                this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+                this.life = 1.0;
+                this.decay = Math.random() * 0.03 + 0.01;
+                this.shape = Math.random() > 0.5 ? 'square' : 'cross';
             }
 
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-
-            class DustParticle {
-                constructor(x, y) {
-                    this.x = x;
-                    this.y = y;
-                    this.vx = (Math.random() - 0.5) * 1.2;
-                    this.vy = -Math.random() * 1.5 - 0.5;
-                    this.size = Math.random() * 2.5 + 0.8;
-                    this.alpha = 1;
-                    this.decay = Math.random() * 0.02 + 0.01;
-                    
-                    const colors = ['#ffd075', '#c27721', '#e0dedc', '#d88a2e'];
-                    this.color = colors[Math.floor(Math.random() * colors.length)];
-                }
-
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    this.alpha -= this.decay;
-                }
-
-                draw() {
-                    ctx.save();
-                    ctx.globalAlpha = Math.max(this.alpha, 0);
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
             }
 
-            function render() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            draw() {
+                starCtx.save();
+                starCtx.fillStyle = this.color;
+                starCtx.globalAlpha = Math.max(this.life, 0);
 
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    particles[i].update();
-                    particles[i].draw();
-
-                    if (particles[i].alpha <= 0) {
-                        particles.splice(i, 1);
-                    }
-                }
-
-                if (particles.length > 0) {
-                    animId = requestAnimationFrame(render);
+                if (this.shape === 'square') {
+                    starCtx.fillRect(this.x, this.y, this.size, this.size);
                 } else {
-                    cancelAnimationFrame(animId);
-                    animId = null;
+                    const s = this.size;
+                    starCtx.fillRect(this.x - s/2, this.y - s/6, s, s/3);
+                    starCtx.fillRect(this.x - s/6, this.y - s/2, s/3, s);
+                }
+                starCtx.restore();
+            }
+        }
+
+        window.addEventListener('mousemove', (e) => {
+            for (let i = 0; i < 2; i++) {
+                particles.push(new StardustParticle(e.clientX, e.clientY));
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+                playPop();
+                for (let i = 0; i < 15; i++) {
+                    particles.push(new StardustParticle(e.clientX, e.clientY));
                 }
             }
+        });
 
-            if (!isTouchDevice) {
-                card.addEventListener('mousemove', (e) => {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-
-                    for (let i = 0; i < 3; i++) {
-                        particles.push(new DustParticle(x, y));
-                    }
-
-                    if (!animId) {
-                        render();
-                    }
-                });
+        function animateStardust() {
+            starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].life <= 0) particles.splice(i, 1);
             }
+            requestAnimationFrame(animateStardust);
+        }
+        animateStardust();
+
+        // --- 3. MOTOR DE FÍSICAS CON MATTER.JS ---
+        const Engine = Matter.Engine,
+              Render = Matter.Render,
+              World = Matter.World,
+              Bodies = Matter.Bodies,
+              Composite = Matter.Composite,
+              Mouse = Matter.Mouse,
+              MouseConstraint = Matter.MouseConstraint;
+
+        const engine = Engine.create();
+        engine.world.gravity.y = 0.8;
+
+        const container = document.getElementById('physics-container');
+        const render = Render.create({
+            element: container,
+            engine: engine,
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                wireframes: false,
+                background: 'transparent'
+            }
+        });
+
+        let ground, leftWall, rightWall;
+
+        function updateBounds() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            
+            if (ground) World.remove(engine.world, [ground, leftWall, rightWall]);
+
+            ground = Bodies.rectangle(w / 2, h + 30, w * 2, 60, { isStatic: true });
+            leftWall = Bodies.rectangle(-30, h / 2, 60, h * 2, { isStatic: true });
+            rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 2, { isStatic: true });
+
+            World.add(engine.world, [ground, leftWall, rightWall]);
+            render.canvas.width = w;
+            render.canvas.height = h;
+        }
+
+        updateBounds();
+        window.addEventListener('resize', updateBounds);
+
+        const mouse = Mouse.create(render.canvas);
+        const mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: { visible: false }
+            }
+        });
+        World.add(engine.world, mouseConstraint);
+
+        Matter.Runner.run(engine);
+        Render.run(render);
+
+        // LANZAR JUGUETES
+        const colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66'];
+        let toys = [];
+
+        function spawnToy() {
+            playBlip(523.25);
+            const x = Math.random() * (window.innerWidth - 200) + 100;
+            const size = Math.floor(Math.random() * 25) + 35;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const shapes = ['box', 'circle', 'polygon'];
+            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+
+            let body;
+            const options = {
+                restitution: 0.85,
+                friction: 0.05,
+                render: {
+                    fillStyle: color,
+                    strokeStyle: '#000000',
+                    lineWidth: 4
+                }
+            };
+
+            if (shapeType === 'box') {
+                body = Bodies.rectangle(x, -50, size * 1.5, size * 1.5, options);
+            } else if (shapeType === 'circle') {
+                body = Bodies.circle(x, -50, size, options);
+            } else {
+                body = Bodies.polygon(x, -50, 5, size, options);
+            }
+
+            toys.push(body);
+            World.add(engine.world, body);
+        }
+
+        document.getElementById('spawn-toy-btn').addEventListener('click', spawnToy);
+
+        document.getElementById('clear-toys-btn').addEventListener('click', () => {
+            playPop();
+            toys.forEach(toy => World.remove(engine.world, toy));
+            toys = [];
+        });
+
+        // --- 4. MINI-CANVASES INTERACTIVOS DENTRO DE LAS TARJETAS ---
+        // Canvas 1: Planeta Giratorio de Píxeles
+        const c1 = document.getElementById('mini-canvas-1');
+        const ctx1 = c1.getContext('2d');
+        let angle1 = 0;
+
+        function drawCanvas1() {
+            c1.width = c1.parentElement.offsetWidth;
+            c1.height = 140;
+            const w = c1.width, h = c1.height;
+
+            ctx1.fillStyle = '#080810';
+            ctx1.fillRect(0, 0, w, h);
+
+            // Anillo
+            ctx1.save();
+            ctx1.translate(w/2, h/2);
+            ctx1.rotate(0.3);
+            ctx1.strokeStyle = '#ffd000';
+            ctx1.lineWidth = 6;
+            ctx1.beginPath();
+            ctx1.ellipse(0, 0, 50, 15, 0, 0, Math.PI * 2);
+            ctx1.stroke();
+            ctx1.restore();
+
+            // Esfera
+            ctx1.fillStyle = '#ff2a85';
+            ctx1.beginPath();
+            ctx1.arc(w/2, h/2, 28, 0, Math.PI * 2);
+            ctx1.fill();
+            ctx1.lineWidth = 4;
+            ctx1.strokeStyle = '#000';
+            ctx1.stroke();
+
+            // Píxel detalle
+            angle1 += 0.03;
+            const px = w/2 + Math.cos(angle1) * 18;
+            const py = h/2 + Math.sin(angle1) * 8;
+            ctx1.fillStyle = '#ffffff';
+            ctx1.fillRect(px - 3, py - 3, 6, 6);
+
+            requestAnimationFrame(drawCanvas1);
+        }
+        drawCanvas1();
+
+        // Canvas 2: Rebote Físico
+        const c2 = document.getElementById('mini-canvas-2');
+        const ctx2 = c2.getContext('2d');
+        let bx = 50, by = 50, vx = 3, vy = 2;
+
+        function drawCanvas2() {
+            c2.width = c2.parentElement.offsetWidth;
+            c2.height = 140;
+            const w = c2.width, h = c2.height;
+
+            ctx2.fillStyle = '#080810';
+            ctx2.fillRect(0, 0, w, h);
+
+            bx += vx;
+            by += vy;
+
+            if (bx < 20 || bx > w - 20) vx *= -1;
+            if (by < 20 || by > h - 20) vy *= -1;
+
+            ctx2.fillStyle = '#00f0ff';
+            ctx2.fillRect(bx - 12, by - 12, 24, 24);
+            ctx2.strokeStyle = '#000000';
+            ctx2.lineWidth = 4;
+            ctx2.strokeRect(bx - 12, by - 12, 24, 24);
+
+            requestAnimationFrame(drawCanvas2);
+        }
+        drawCanvas2();
+
+        // Canvas 3: Radar Espacial NASA
+        const c3 = document.getElementById('mini-canvas-3');
+        const ctx3 = c3.getContext('2d');
+        let radarAngle = 0;
+
+        function drawCanvas3() {
+            c3.width = c3.parentElement.offsetWidth;
+            c3.height = 140;
+            const w = c3.width, h = c3.height;
+
+            ctx3.fillStyle = '#080810';
+            ctx3.fillRect(0, 0, w, h);
+
+            // Círculos de radar
+            ctx3.strokeStyle = '#00ff66';
+            ctx3.lineWidth = 2;
+            ctx3.beginPath();
+            ctx3.arc(w/2, h/2, 45, 0, Math.PI * 2);
+            ctx3.arc(w/2, h/2, 25, 0, Math.PI * 2);
+            ctx3.stroke();
+
+            // Aguja radar
+            radarAngle += 0.04;
+            ctx3.save();
+            ctx3.translate(w/2, h/2);
+            ctx3.rotate(radarAngle);
+            ctx3.strokeStyle = '#00ff66';
+            ctx3.lineWidth = 3;
+            ctx3.beginPath();
+            ctx3.moveTo(0, 0);
+            ctx3.lineTo(45, 0);
+            ctx3.stroke();
+            ctx3.restore();
+
+            requestAnimationFrame(drawCanvas3);
+        }
+        drawCanvas3();
+
+        // Sonidos en hover de tarjetas
+        document.querySelectorAll('.toy-card:not(.disabled)').forEach(card => {
+            card.addEventListener('mouseenter', () => playBlip(300));
+        });
+    </script>
+</body>
+</html>
         });
     </script>
 </body>
