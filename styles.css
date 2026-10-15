@@ -5,7 +5,6 @@
     --text-primary: #ffffff;
     --text-muted: #a0a0b8;
     
-    /* PALETA POP RETRO */
     --color-yellow: #ffd000;
     --color-cyan: #00f0ff;
     --color-pink: #ff2a85;
@@ -16,12 +15,18 @@
     --font-mono: 'JetBrains Mono', monospace;
 }
 
-/* RESET CONTROLADO Y GEOMETRÍA CUADRADA */
-* {
+/* RESET CONTROLADO */
+*, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     border-radius: 0 !important;
+}
+
+html, body {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 body {
@@ -29,7 +34,6 @@ body {
     color: var(--text-primary);
     font-family: var(--font-heading);
     min-height: 100vh;
-    overflow-x: hidden;
     position: relative;
     -webkit-font-smoothing: antialiased;
 }
@@ -58,16 +62,17 @@ body {
 
 #physics-container canvas {
     display: block;
+    max-width: 100vw;
 }
 
-/* CONTENEDOR PRINCIPAL FIX */
+/* CONTENEDOR PRINCIPAL QUE LIMITA EL ANCHO EN CUALQUIER PANTALLA */
 .wrapper {
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 850px;
+    max-width: 800px; /* Tamaño exacto para no desbordar */
     margin: 0 auto;
-    padding: 40px 20px 80px 20px;
+    padding: 30px 16px 60px 16px;
     pointer-events: none;
 }
 
@@ -75,12 +80,12 @@ body {
     pointer-events: auto;
 }
 
-/* HEADER Y CONTROLES PROPORCIONADOS */
+/* HEADER Y CONTROLES */
 .site-header {
     background: var(--card-bg);
     border: 3px solid var(--text-primary);
-    padding: 24px 28px;
-    margin-bottom: 32px;
+    padding: 24px;
+    margin-bottom: 30px;
     box-shadow: 6px 6px 0px var(--color-pink);
     width: 100%;
 }
@@ -91,12 +96,12 @@ body {
     align-items: center;
     margin-bottom: 16px;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
 }
 
 .brand-badge {
     font-family: var(--font-pixel);
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     color: var(--color-yellow);
     background: #000;
     padding: 6px 10px;
@@ -105,23 +110,17 @@ body {
 
 .btn-retro {
     font-family: var(--font-pixel);
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     background: #000;
     color: var(--color-cyan);
     border: 2px solid var(--color-cyan);
     padding: 6px 10px;
     cursor: pointer;
-    transition: transform 0.1s ease;
-}
-
-.btn-retro:hover {
-    background: var(--color-cyan);
-    color: #000;
 }
 
 .glitch-title {
     font-family: var(--font-heading);
-    font-size: 2.8rem;
+    font-size: 2.6rem;
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: -1px;
@@ -132,11 +131,10 @@ body {
 }
 
 .hero-desc {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     color: var(--text-muted);
     line-height: 1.5;
-    max-width: 650px;
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
 .toybox-controls {
@@ -147,12 +145,11 @@ body {
 
 .btn-action {
     font-family: var(--font-pixel);
-    font-size: 0.65rem;
-    padding: 12px 18px;
+    font-size: 0.6rem;
+    padding: 12px 16px;
     border: 2px solid #000;
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.15s ease;
 }
 
 .spawn-btn {
@@ -162,8 +159,6 @@ body {
 }
 
 .spawn-btn:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px #000;
     background: #22ff88;
 }
 
@@ -180,33 +175,31 @@ body {
     border-color: #000;
 }
 
-/* GRID DE TARJETAS */
+/* GRID DE TARJETAS ESTRICTO */
 .toybox-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    gap: 20px;
     width: 100%;
 }
 
 .toy-card {
     background: var(--card-bg);
     border: 2px solid var(--border-color);
-    padding: 20px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 6px 6px 0px #000;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 5px 5px 0px #000;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
 }
 
-.toy-card[data-color="yellow"]:hover { border-color: var(--color-yellow); box-shadow: 6px 6px 0px var(--color-yellow); }
-.toy-card[data-color="cyan"]:hover { border-color: var(--color-cyan); box-shadow: 6px 6px 0px var(--color-cyan); }
-.toy-card[data-color="pink"]:hover { border-color: var(--color-pink); box-shadow: 6px 6px 0px var(--color-pink); }
-.toy-card[data-color="green"]:hover { border-color: var(--color-green); box-shadow: 6px 6px 0px var(--color-green); }
-
-.toy-card:hover {
-    transform: translateY(-4px);
-}
+.toy-card[data-color="yellow"]:hover { border-color: var(--color-yellow); box-shadow: 5px 5px 0px var(--color-yellow); }
+.toy-card[data-color="cyan"]:hover { border-color: var(--color-cyan); box-shadow: 5px 5px 0px var(--color-cyan); }
+.toy-card[data-color="pink"]:hover { border-color: var(--color-pink); box-shadow: 5px 5px 0px var(--color-pink); }
+.toy-card[data-color="green"]:hover { border-color: var(--color-green); box-shadow: 5px 5px 0px var(--color-green); }
 
 .toy-card.disabled {
     opacity: 0.6;
@@ -222,17 +215,17 @@ body {
 
 .toy-tag {
     font-family: var(--font-pixel);
-    font-size: 0.52rem;
+    font-size: 0.5rem;
     color: var(--text-muted);
 }
 
 .toy-badge {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: bold;
     background: var(--color-green);
     color: #000;
-    padding: 3px 6px;
+    padding: 2px 6px;
     border: 1px solid #000;
 }
 
@@ -242,38 +235,42 @@ body {
     border-color: var(--border-color);
 }
 
-/* CANVAS DE MINI TARJETAS */
 .canvas-container {
     width: 100%;
     height: 120px;
     background: #080810;
     border: 2px solid #000;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     overflow: hidden;
+}
+
+.canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 120px !important;
 }
 
 .placeholder-canvas {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
 }
 
 .toy-card h2 {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 900;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .toy-card p {
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     color: var(--text-muted);
     line-height: 1.4;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
-/* BOTONES */
 .card-actions {
     margin-top: auto;
 }
@@ -282,12 +279,11 @@ body {
     display: block;
     text-align: center;
     font-family: var(--font-pixel);
-    font-size: 0.62rem;
-    padding: 12px;
+    font-size: 0.58rem;
+    padding: 10px;
     text-decoration: none;
     font-weight: bold;
     border: 2px solid #000;
-    transition: all 0.15s ease;
 }
 
 .toy-link.primary {
@@ -298,8 +294,6 @@ body {
 
 .toy-link.primary:hover {
     background: #ffffff;
-    transform: translate(-2px, -2px);
-    box-shadow: 5px 5px 0px #000;
 }
 
 .toy-link.disabled {
@@ -309,28 +303,18 @@ body {
     cursor: not-allowed;
 }
 
-/* FOOTER */
 .site-footer {
-    margin-top: 40px;
-    padding-top: 20px;
+    margin-top: 36px;
+    padding-top: 18px;
     border-top: 2px solid var(--border-color);
     text-align: center;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .glitch-title {
-        font-size: 2.2rem;
-    }
-    
+@media (max-width: 650px) {
     .toybox-grid {
         grid-template-columns: 1fr;
-    }
-
-    .site-header {
-        padding: 18px;
     }
 }
