@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
@@ -144,18 +144,26 @@
             }
         }
 
+        window.addEventListener('click', async () => {
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+            }
+        }, { once: true });
+
         function playBlip(freq = 440) {
             if (!soundEnabled) return;
             initAudio();
-            Tone.start();
-            synth.triggerAttackRelease(freq, "8n");
+            if (Tone.context.state === 'running') {
+                synth.triggerAttackRelease(freq, "8n");
+            }
         }
 
         function playPop() {
             if (!soundEnabled) return;
             initAudio();
-            Tone.start();
-            noiseSynth.triggerAttackRelease("16n");
+            if (Tone.context.state === 'running') {
+                noiseSynth.triggerAttackRelease("16n");
+            }
         }
 
         document.getElementById('sound-toggle').addEventListener('click', () => {
@@ -163,6 +171,14 @@
             const btn = document.getElementById('sound-toggle');
             btn.innerHTML = soundEnabled ? '<span>🔊</span> AUDIO: ON' : '<span>🔇</span> AUDIO: OFF';
             if (soundEnabled) playBlip(600);
+        });
+
+        // Evento para ocultar el overlay de bienvenida al presionar el botón
+        document.getElementById('shoot-trigger-btn').addEventListener('click', () => {
+            const welcomeScreen = document.getElementById('retro-welcome-screen');
+            if (welcomeScreen) {
+                welcomeScreen.style.display = 'none';
+            }
         });
 
         const starCanvas = document.getElementById('stardust-canvas');
@@ -351,115 +367,31 @@
             toys = [];
         });
 
-        // MINI CANVASES
         const c1 = document.getElementById('mini-canvas-1');
         const ctx1 = c1.getContext('2d');
-        let angle1 = 0;
-
-        function drawCanvas1() {
-            const w = c1.parentElement.clientWidth || 300;
-            c1.width = w;
-            c1.height = 120;
-
-            ctx1.fillStyle = '#080810';
-            ctx1.fillRect(0, 0, w, 120);
-
-            ctx1.save();
-            ctx1.translate(w/2, 60);
-            ctx1.rotate(0.3);
-            ctx1.strokeStyle = '#ffd000';
-            ctx1.lineWidth = 4;
-            ctx1.beginPath();
-            ctx1.ellipse(0, 0, 38, 12, 0, 0, Math.PI * 2);
-            ctx1.stroke();
-            ctx1.restore();
-
-            ctx1.fillStyle = '#ff2a85';
-            ctx1.beginPath();
-            ctx1.arc(w/2, 60, 20, 0, Math.PI * 2);
-            ctx1.fill();
-            ctx1.lineWidth = 3;
-            ctx1.strokeStyle = '#000';
-            ctx1.stroke();
-
-            angle1 += 0.03;
-            const px = w/2 + Math.cos(angle1) * 15;
-            const py = 60 + Math.sin(angle1) * 6;
-            ctx1.fillStyle = '#ffffff';
-            ctx1.fillRect(px - 2, py - 2, 4, 4);
-
-            requestAnimationFrame(drawCanvas1);
-        }
-        drawCanvas1();
-
         const c2 = document.getElementById('mini-canvas-2');
         const ctx2 = c2.getContext('2d');
-        let bx = 30, by = 30, vx = 2.5, vy = 2;
-
-        function drawCanvas2() {
-            const w = c2.parentElement.clientWidth || 300;
-            c2.width = w;
-            c2.height = 120;
-
-            ctx2.fillStyle = '#080810';
-            ctx2.fillRect(0, 0, w, 120);
-
-            bx += vx;
-            by += vy;
-
-            if (bx < 15 || bx > w - 15) vx *= -1;
-            if (by < 15 || by > 105) vy *= -1;
-
-            ctx2.fillStyle = '#00f0ff';
-            ctx2.fillRect(bx - 10, by - 10, 20, 20);
-            ctx2.strokeStyle = '#000000';
-            ctx2.lineWidth = 3;
-            ctx2.strokeRect(bx - 10, by - 10, 20, 20);
-
-            requestAnimationFrame(drawCanvas2);
-        }
-        drawCanvas2();
-
         const c3 = document.getElementById('mini-canvas-3');
         const ctx3 = c3.getContext('2d');
-        let radarAngle = 0;
 
-        function drawCanvas3() {
-            const w = c3.parentElement.clientWidth || 300;
-            c3.width = w;
-            c3.height = 120;
-
-            ctx3.fillStyle = '#080810';
-            ctx3.fillRect(0, 0, w, 120);
-
-            ctx3.strokeStyle = '#00ff66';
-            ctx3.lineWidth = 2;
-            ctx3.beginPath();
-            ctx3.arc(w/2, 60, 38, 0, Math.PI * 2);
-            ctx3.arc(w/2, 60, 18, 0, Math.PI * 2);
-            ctx3.stroke();
-
-            radarAngle += 0.04;
-            ctx3.save();
-            ctx3.translate(w/2, 60);
-            ctx3.rotate(radarAngle);
-            ctx3.strokeStyle = '#00ff66';
-            ctx3.lineWidth = 2;
-            ctx3.beginPath();
-            ctx3.moveTo(0, 0);
-            ctx3.lineTo(38, 0);
-            ctx3.stroke();
-            ctx3.restore();
-
-            requestAnimationFrame(drawCanvas3);
+        function resizeMiniCanvases() {
+            [c1, c2, c3].forEach(canvas => {
+                if (canvas && canvas.parentElement) {
+                    canvas.width = canvas.parentElement.clientWidth || 300;
+                    canvas.height = 120;
+                }
+            });
         }
-        drawCanvas3();
+        resizeMiniCanvases();
+        window.addEventListener('resize', resizeMiniCanvases);
 
-        document.querySelectorAll('.toy-card:not(.disabled)').forEach(card => {
-            card.addEventListener('mouseenter', () => playBlip(300));
-        });
-    </script>
+        let angle1 = 0;
+        function drawCanvas1() {
+            const w = c1.width;
+            ctx1.clearRect(0, 0, w, 120);
 
+            ctx1.fillStyle = '#080810';
+            ctx1.fillRect(0, 0
 <script src="intro.js"></script>
 </body>
 </html>
