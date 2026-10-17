@@ -45,50 +45,53 @@
                 </button>
             </div>
             
-            <h1 class="glitch-title">RisaToys</h1>
+            <h1 class="glitch-title">RISATOYS</h1>
             <p class="hero-desc">Un patio de juegos digital con físicas, polvo de estrellas, gráficos 2D/3D y simulaciones interactivas creadas con código.</p>
 
             <div class="toybox-controls">
                 <button id="spawn-toy-btn" class="btn-action spawn-btn">¡TIRAR JUGUETE AL SUELO! 🪐</button>
-                <button id="clear-toys-btn" class="btn-action clear-btn">LIMPIAR SUELO 🧹</button>
+                <button id="clear-toys-btn" class="btn-action clear-btn">LIMPIAR MESA 🧹</button>
             </div>
         </header>
 
         <section class="toybox-grid">
 
+            <!-- TARJETA 1: VALKYRIE-9 -->
             <article class="toy-card" data-color="yellow">
                 <div class="card-header">
-                    <span class="toy-tag">THREE.JS</span>
+                    <span class="toy-tag">THREE.JS / 3D</span>
                     <span class="toy-badge">EN VIVO</span>
                 </div>
                 <div class="canvas-container">
                     <canvas id="mini-canvas-1"></canvas>
                 </div>
-                <h2>AEROX</h2>
+                <h2>VALKYRIE-9</h2>
                 <p>Visor tridimensional interactivo de una nave espacial en órbita con controles de cámara.</p>
                 <div class="card-actions">
                     <a href="https://brisa-delcielo.github.io/aeROX/" target="_blank" class="toy-link primary">JUGAR AHORA ↗</a>
                 </div>
             </article>
 
+            <!-- TARJETA 2: APEX -->
             <article class="toy-card" data-color="cyan">
                 <div class="card-header">
-                    <span class="toy-tag">FÍSICA</span>
+                    <span class="toy-tag">CANVAS 2D / FÍSICA</span>
                     <span class="toy-badge">EN VIVO</span>
                 </div>
                 <div class="canvas-container">
                     <canvas id="mini-canvas-2"></canvas>
                 </div>
                 <h2>APEX</h2>
-                <p>Simulador mecánico interactivo de combustión.</p>
+                <p>Simulador mecánico interactivo con partículas, rebotes y detección de colisiones.</p>
                 <div class="card-actions">
                     <a href="https://brisa-delcielo.github.io/FiSic4/" target="_blank" class="toy-link primary">JUGAR AHORA ↗</a>
                 </div>
             </article>
 
+            <!-- TARJETA 3: MISIÓN -->
             <article class="toy-card" data-color="pink">
                 <div class="card-header">
-                    <span class="toy-tag">NASA APIS</span>
+                    <span class="toy-tag">NASA APIS / DATOS</span>
                     <span class="toy-badge">EN VIVO</span>
                 </div>
                 <div class="canvas-container">
@@ -101,6 +104,7 @@
                 </div>
             </article>
 
+            <!-- TARJETA 4: PRÓXIMAMENTE -->
             <article class="toy-card disabled" data-color="green">
                 <div class="card-header">
                     <span class="toy-tag">PRÓXIMAMENTE</span>
@@ -147,8 +151,7 @@
         function playBlip(freq = 440) {
             if (!soundEnabled) return;
             initAudio();
-            // CORRECCIÓN SILENCIOSA: Verifica que el contexto de audio esté activo antes de reproducir
-            if (Tone.context.state === 'running') {
+            if (Tone.context && Tone.context.state === 'running') {
                 synth.triggerAttackRelease(freq, "8n");
             }
         }
@@ -156,8 +159,7 @@
         function playPop() {
             if (!soundEnabled) return;
             initAudio();
-            // CORRECCIÓN SILENCIOSA: Verifica que el contexto de audio esté activo antes de reproducir
-            if (Tone.context.state === 'running') {
+            if (Tone.context && Tone.context.state === 'running') {
                 noiseSynth.triggerAttackRelease("16n");
             }
         }
@@ -356,7 +358,6 @@
         });
 
         // MINI CANVASES
-        // CORRECCIÓN SILENCIOSA: Redimensionamiento sacado fuera del ciclo requestAnimationFrame para evitar caídas de FPS.
         const c1 = document.getElementById('mini-canvas-1');
         const ctx1 = c1.getContext('2d');
         const c2 = document.getElementById('mini-canvas-2');
@@ -375,6 +376,7 @@
         resizeMiniCanvases();
         window.addEventListener('resize', resizeMiniCanvases);
 
+        // Proyecto VALKYRIE-9
         let angle1 = 0;
         function drawCanvas1() {
             const w = c1.width;
@@ -411,6 +413,7 @@
         }
         drawCanvas1();
 
+        // Proyecto APEX
         let bx = 30, by = 30, vx = 2.5, vy = 2;
         function drawCanvas2() {
             const w = c2.width;
@@ -435,6 +438,7 @@
         }
         drawCanvas2();
 
+        // Proyecto MISIÓN
         let radarAngle = 0;
         function drawCanvas3() {
             const w = c3.width;
