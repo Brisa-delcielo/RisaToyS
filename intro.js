@@ -1,237 +1,351 @@
-(function () {
-    const welcomeScreen = document.getElementById('retro-welcome-screen');
-    const canvas = document.getElementById('intro-canvas');
-    if (!canvas) return;
+let soundEnabled = true;
+let synth, noiseSynth;
 
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    let destroyed = false;
+function initAudio() {
+    if (!synth) {
+        synth = new Tone.Synth({
+            oscillator: { type: "square" },
+            envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
+        }).toDestination();
+        synth.volume.value = -12;
 
-    function resizeIntro() {
-        const rect = canvas.parentElement.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.height;
+        noiseSynth = new Tone.NoiseSynth({
+            noise: { type: "white" },
+            envelope: { attack: 0.005, decay: 0.05, sustain: 0 }
+        }).toDestination();
+        noiseSynth.volume.value = -18;
     }
-    resizeIntro();
-    window.addEventListener('resize', resizeIntro);
+}
 
-    let shipX = 40;
-    let shipSpeed = 2;
-    let shipDirection = 1;
-    let shipY = 55;
+window.addEventListener('click', async () => {
+    if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state !== 'running') {
+        await Tone.start();
+    }
+}, { once: true });
 
-    let laser = null;
-    let explosions = [];
+function playBlip(freq = 440) {
+    if (!soundEnabled) return;
+    initAudio();
+    if (Tone.context && Tone.context.state === 'running') {
+        synth.triggerAttackRelease(freq, "8n");
+    }
+}
 
-    const stars = Array.from({ length: 30 }, () => ({
-        x: Math.random() * 500,
-        y: Math.random() * 320,
-        size: Math.random() * 2 + 1
-    }));
+function playPop() {
+    if (!soundEnabled) return;
+    initAudio();
+    if (Tone.context && Tone.context.state === 'running') {
+        noiseSynth.triggerAttackRelease("16n");
+    }
+}
 
-    function gameLoop() {
-        ctx.fillStyle = '#05050d';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+document.getElementById('sound-toggle').addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('sound-toggle');
+    btn.innerHTML = soundEnabled ? '<span>🔊</span> AUDIO: ON' : '<span>🔇</span> AUDIO: OFF';
+    if (soundEnabled) playBlip(600);
+});
 
-        ctx.shadowBlur = 0;
-        ctx.shadowColor = 'transparent';
+const starCanvas = document.getElementById('stardust-canvas');
+const starCtx = starCanvas.getContext('2d');
+let particles = [];
+let backgroundStars = [];
 
-        ctx.fillStyle = '#ffffff';
-        stars.forEach(s => ctx.fillRect(s.x % canvas.width, s.y % canvas.height, s.size, s.size));
-
-        shipX += shipSpeed * shipDirection;
-        if (shipX > canvas.width - 60 || shipX < 20) {
-            shipDirection *= -1;
-        }
-
-        if (!destroyed) {
-            drawRetroTarget(shipX, shipY);
-        }
-
-        drawPixelGun(canvas.width / 2, canvas.height - 15);
-
-        if (laser) {
-            laser.y += laser.vy;
-            ctx.fillStyle = '#00f0ff';
-            ctx.fillRect(laser.x - 3, laser.y, 6, 16);
-
-            if (!destroyed && Math.abs(laser.x - (shipX + 20)) < 25 && Math.abs(laser.y - shipY) < 20) {
-                triggerPacmanDeathAndShatter(shipX + 20, shipY);
-                laser = null;
-            } else if (laser.y < -20) {
-                laser = null;
-            }
-        }
-
-        explosions.forEach((p, index) => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.alpha -= 0.02;
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = Math.max(p.alpha, 0);
-            ctx.fillRect(p.x, p.y, p.size, p.size);
-            ctx.globalAlpha = 1.0;
-            if (p.alpha <= 0) explosions.splice(index, 1);
+function resizeStarCanvas() {
+    starCanvas.width = window.innerWidth;
+    starCanvas.height = window.innerHeight;
+    
+    backgroundStars = [];
+    for(let i = 0; i < 60; i++) {
+        backgroundStars.push({
+            x: Math.random() * starCanvas.width,
+            y: Math.random() * starCanvas.height,
+            size: Math.random() * 3 + 1,
+            alpha: Math.random()
         });
+    }
+}
+resizeStarCanvas();
+window.addEventListener('resize', resizeStarCanvas);
 
-        if (!destroyed || explosions.length > 0) {
-            animationFrameId = requestAnimationFrame(gameLoop);
-        }
+class StardustParticle {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.floor(Math.random() * 8) + 4;
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = (Math.random() - 0.5) * 4 - 1;
+        this.colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66', '#ffffff'];
+        this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
+        this.life = 1.0;
+        this.decay = Math.random() * 0.03 + 0.015;
+        this.shape = Math.random() > 0.5 ? 'square' : 'cross';
     }
 
-    function drawRetroTarget(x, y) {
-        ctx.save();
-        ctx.fillStyle = '#ffd000';
-        ctx.fillRect(x + 10, y - 10, 20, 8);
-        ctx.fillStyle = '#ff2a85';
-        ctx.fillRect(x + 4, y, 32, 10);
-        ctx.fillStyle = '#00f0ff';
-        ctx.fillRect(x + 12, y + 2, 16, 6);
-        ctx.fillStyle = '#00ff66';
-        ctx.fillRect(x, y + 10, 8, 6);
-        ctx.fillRect(x + 32, y + 10, 8, 6);
-        ctx.restore();
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= this.decay;
     }
 
-    function drawPixelGun(x, y) {
-        ctx.save();
-        ctx.fillStyle = '#00f0ff';
-        ctx.fillRect(x - 6, y - 28, 12, 28);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(x - 3, y - 36, 6, 8);
-        ctx.fillStyle = '#ff2a85';
-        ctx.fillRect(x - 18, y - 6, 36, 10);
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(x - 2, y - 18, 4, 8);
-        ctx.restore();
+    draw() {
+        starCtx.save();
+        starCtx.fillStyle = this.color;
+        starCtx.globalAlpha = Math.max(this.life, 0);
+
+        if (this.shape === 'square') {
+            starCtx.fillRect(this.x, this.y, this.size, this.size);
+        } else {
+            const s = this.size;
+            starCtx.fillRect(this.x - s/2, this.y - s/6, s, s/3);
+            starCtx.fillRect(this.x - s/6, this.y - s/2, s/3, s);
+        }
+        starCtx.restore();
+    }
+}
+
+function addDust(x, y, count = 2) {
+    for (let i = 0; i < count; i++) {
+        particles.push(new StardustParticle(x, y));
+    }
+}
+
+window.addEventListener('mousemove', (e) => addDust(e.clientX, e.clientY, 2));
+window.addEventListener('touchmove', (e) => {
+    if(e.touches[0]) addDust(e.touches[0].clientX, e.touches[0].clientY, 3);
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+        playPop();
+        addDust(e.clientX, e.clientY, 20);
+    }
+});
+
+function animateStardust() {
+    starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+    
+    starCtx.fillStyle = "#ffffff";
+    backgroundStars.forEach(star => {
+        star.alpha += (Math.random() - 0.5) * 0.05;
+        if(star.alpha < 0.2) star.alpha = 0.2;
+        if(star.alpha > 1) star.alpha = 1;
+        starCtx.globalAlpha = star.alpha;
+        starCtx.fillRect(star.x, star.y, star.size, star.size);
+    });
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].life <= 0) particles.splice(i, 1);
+    }
+    requestAnimationFrame(animateStardust);
+}
+animateStardust();
+
+const Engine = Matter.Engine,
+      Render = Matter.Render,
+      World = Matter.World,
+      Bodies = Matter.Bodies,
+      Mouse = Matter.Mouse,
+      MouseConstraint = Matter.MouseConstraint;
+
+const engine = Engine.create();
+engine.world.gravity.y = 0.8;
+
+const container = document.getElementById('physics-container');
+const render = Render.create({
+    element: container,
+    engine: engine,
+    options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: false,
+        background: 'transparent' 
+    }
+});
+
+let ground, leftWall, rightWall;
+
+function updateBounds() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    
+    if (ground) World.remove(engine.world, [ground, leftWall, rightWall]);
+
+    ground = Bodies.rectangle(w / 2, h + 30, w * 2, 60, { isStatic: true });
+    leftWall = Bodies.rectangle(-30, h / 2, 60, h * 2, { isStatic: true });
+    rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 2, { isStatic: true });
+
+    World.add(engine.world, [ground, leftWall, rightWall]);
+    render.canvas.width = w;
+    render.canvas.height = h;
+}
+
+updateBounds();
+window.addEventListener('resize', updateBounds);
+
+const mouse = Mouse.create(render.canvas);
+const mouseConstraint = MouseConstraint.create(engine, {
+    mouse: mouse,
+    constraint: { stiffness: 0.2, render: { visible: false } }
+});
+World.add(engine.world, mouseConstraint);
+
+Matter.Runner.run(engine);
+Render.run(render);
+
+const colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66'];
+let toys = [];
+
+function spawnToy() {
+    playBlip(523.25);
+    const x = Math.random() * (window.innerWidth - 100) + 50;
+    const size = Math.floor(Math.random() * 18) + 22;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    const shapes = ['box', 'circle', 'polygon'];
+    const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+
+    let body;
+    const options = {
+        restitution: 0.8,
+        friction: 0.05,
+        render: { fillStyle: color, strokeStyle: '#000000', lineWidth: 3 }
+    };
+
+    if (shapeType === 'box') {
+        body = Bodies.rectangle(x, -50, size * 1.5, size * 1.5, options);
+    } else if (shapeType === 'circle') {
+        body = Bodies.circle(x, -50, size, options);
+    } else {
+        body = Bodies.polygon(x, -50, 5, size, options);
     }
 
-    function shoot() {
-        if (laser || destroyed) return;
-        laser = { x: canvas.width / 2, y: canvas.height - 40, vy: -12 };
+    toys.push(body);
+    World.add(engine.world, body);
+}
 
-        if (window.Tone) {
-            try {
-                Tone.start();
-                const synth = new Tone.Synth().toDestination();
-                synth.triggerAttackRelease("C6", "16n");
-            } catch (e) {}
+document.getElementById('spawn-toy-btn').addEventListener('click', spawnToy);
+document.getElementById('clear-toys-btn').addEventListener('click', () => {
+    playPop();
+    toys.forEach(toy => World.remove(engine.world, toy));
+    toys = [];
+});
+
+const c1 = document.getElementById('mini-canvas-1');
+const ctx1 = c1.getContext('2d');
+const c2 = document.getElementById('mini-canvas-2');
+const ctx2 = c2.getContext('2d');
+const c3 = document.getElementById('mini-canvas-3');
+const ctx3 = c3.getContext('2d');
+
+function updateMiniCanvasDimensions() {
+    [c1, c2, c3].forEach(canvas => {
+        if (canvas && canvas.parentElement) {
+            const width = canvas.parentElement.clientWidth || 300;
+            if (canvas.width !== width) canvas.width = width;
+            canvas.height = 120;
         }
-    }
+    });
+}
 
-    canvas.addEventListener('click', shoot);
-    document.getElementById('shoot-trigger-btn').addEventListener('click', shoot);
+window.addEventListener('resize', updateMiniCanvasDimensions);
 
-    function triggerPacmanDeathAndShatter(impactX, impactY) {
-        destroyed = true;
+// VALKYRIE-9
+let angle1 = 0;
+function drawCanvas1() {
+    updateMiniCanvasDimensions();
+    const w = c1.width || 300;
+    ctx1.clearRect(0, 0, w, 120);
 
-        if (window.Tone) {
-            try {
-                Tone.start();
-                const now = Tone.now();
-                const synth = new Tone.Synth({
-                    oscillator: { type: 'square' },
-                    envelope: { attack: 0.005, decay: 0.08, sustain: 0, release: 0.05 }
-                }).toDestination();
+    ctx1.fillStyle = '#080810';
+    ctx1.fillRect(0, 0, w, 120);
 
-                const pacmanNotes = [
-                    "B4", "B5", "F#5", "D#5", "B5", "F#5", "D#5",
-                    "C5", "C6", "G5", "E5", "C6", "G5", "E5",
-                    "B4", "B5", "F#5", "D#5", "B5", "F#5", "D#5",
-                    "F5", "F#5", "G5", "G#5", "A5"
-                ];
+    ctx1.save();
+    ctx1.translate(w/2, 60);
+    ctx1.rotate(0.3);
+    ctx1.strokeStyle = '#ffd000';
+    ctx1.lineWidth = 4;
+    ctx1.beginPath();
+    ctx1.ellipse(0, 0, 38, 12, 0, 0, Math.PI * 2);
+    ctx1.stroke();
+    ctx1.restore();
 
-                pacmanNotes.forEach((note, i) => {
-                    synth.triggerAttackRelease(note, "32n", now + i * 0.045);
-                });
-            } catch (e) {}
-        }
+    ctx1.fillStyle = '#ff2a85';
+    ctx1.beginPath();
+    ctx1.arc(w/2, 60, 20, 0, Math.PI * 2);
+    ctx1.fill();
+    ctx1.lineWidth = 3;
+    ctx1.strokeStyle = '#000';
+    ctx1.stroke();
 
-        for (let i = 0; i < 40; i++) {
-            explosions.push({
-                x: impactX,
-                y: impactY,
-                vx: (Math.random() - 0.5) * 12,
-                vy: (Math.random() - 0.5) * 12,
-                size: Math.floor(Math.random() * 6) + 4,
-                color: ['#ffd000', '#ff2a85', '#00f0ff', '#ffffff'][Math.floor(Math.random() * 4)],
-                alpha: 1.0
-            });
-        }
+    angle1 += 0.03;
+    const px = w/2 + Math.cos(angle1) * 15;
+    const py = 60 + Math.sin(angle1) * 6;
+    ctx1.fillStyle = '#ffffff';
+    ctx1.fillRect(px - 2, py - 2, 4, 4);
 
-        setTimeout(() => {
-            createGlassShatterEffect();
-            welcomeScreen.classList.add('shattering');
-            setTimeout(() => {
-                welcomeScreen.style.display = 'none';
-                cancelAnimationFrame(animationFrameId);
-            }, 600);
-        }, 300);
-    }
+    requestAnimationFrame(drawCanvas1);
+}
+drawCanvas1();
 
-    function createGlassShatterEffect() {
-        const shatterCanvas = document.createElement('canvas');
-        shatterCanvas.id = 'shatter-canvas';
-        shatterCanvas.width = window.innerWidth;
-        shatterCanvas.height = window.innerHeight;
-        document.body.appendChild(shatterCanvas);
+// APEX
+let bx = 30, by = 30, vx = 2.5, vy = 2;
+function drawCanvas2() {
+    const w = c2.width || 300;
+    ctx2.clearRect(0, 0, w, 120);
 
-        const sCtx = shatterCanvas.getContext('2d');
-        const shards = [];
+    ctx2.fillStyle = '#080810';
+    ctx2.fillRect(0, 0, w, 120);
 
-        for (let i = 0; i < 35; i++) {
-            shards.push({
-                x: Math.random() * shatterCanvas.width,
-                y: Math.random() * shatterCanvas.height,
-                vx: (Math.random() - 0.5) * 20,
-                vy: (Math.random() - 0.5) * 20 - 5,
-                rot: 0,
-                vRot: (Math.random() - 0.5) * 0.2,
-                points: [
-                    { x: 0, y: 0 },
-                    { x: Math.random() * 60 - 30, y: Math.random() * 60 + 30 },
-                    { x: Math.random() * 60 + 30, y: Math.random() * 60 - 30 }
-                ],
-                alpha: 1.0
-            });
-        }
+    bx += vx;
+    by += vy;
 
-        let frame = 0;
-        function animateShatter() {
-            sCtx.clearRect(0, 0, shatterCanvas.width, shatterCanvas.height);
-            shards.forEach(s => {
-                s.x += s.vx;
-                s.y += s.vy;
-                s.vy += 0.5;
-                s.rot += s.vRot;
-                s.alpha -= 0.02;
+    if (bx < 15 || bx > w - 15) vx *= -1;
+    if (by < 15 || by > 105) vy *= -1;
 
-                sCtx.save();
-                sCtx.translate(s.x, s.y);
-                sCtx.rotate(s.rot);
-                sCtx.fillStyle = 'rgba(255, 255, 255, ' + Math.max(s.alpha, 0) + ')';
-                sCtx.strokeStyle = 'rgba(0, 240, 255, ' + Math.max(s.alpha, 0) + ')';
-                sCtx.lineWidth = 2;
+    ctx2.fillStyle = '#00f0ff';
+    ctx2.fillRect(bx - 10, by - 10, 20, 20);
+    ctx2.strokeStyle = '#000000';
+    ctx2.lineWidth = 3;
+    ctx2.strokeRect(bx - 10, by - 10, 20, 20);
 
-                sCtx.beginPath();
-                sCtx.moveTo(s.points[0].x, s.points[0].y);
-                sCtx.lineTo(s.points[1].x, s.points[1].y);
-                sCtx.lineTo(s.points[2].x, s.points[2].y);
-                sCtx.closePath();
-                sCtx.fill();
-                sCtx.stroke();
-                sCtx.restore();
-            });
+    requestAnimationFrame(drawCanvas2);
+}
+drawCanvas2();
 
-            frame++;
-            if (frame < 60) {
-                requestAnimationFrame(animateShatter);
-            } else {
-                shatterCanvas.remove();
-            }
-        }
-        animateShatter();
-    }
+// MISIÓN
+let radarAngle = 0;
+function drawCanvas3() {
+    const w = c3.width || 300;
+    ctx3.clearRect(0, 0, w, 120);
 
-    gameLoop();
-})();
+    ctx3.fillStyle = '#080810';
+    ctx3.fillRect(0, 0, w, 120);
+
+    ctx3.strokeStyle = '#00ff66';
+    ctx3.lineWidth = 2;
+    ctx3.beginPath();
+    ctx3.arc(w/2, 60, 38, 0, Math.PI * 2);
+    ctx3.arc(w/2, 60, 18, 0, Math.PI * 2);
+    ctx3.stroke();
+
+    radarAngle += 0.04;
+    ctx3.save();
+    ctx3.translate(w/2, 60);
+    ctx3.rotate(radarAngle);
+    ctx3.strokeStyle = '#00ff66';
+    ctx3.lineWidth = 2;
+    ctx3.beginPath();
+    ctx3.moveTo(0, 0);
+    ctx3.lineTo(38, 0);
+    ctx3.stroke();
+    ctx3.restore();
+
+    requestAnimationFrame(drawCanvas3);
+}
+drawCanvas3();
+
+document.querySelectorAll('.toy-card:not(.disabled)').forEach(card => {
+    card.addEventListener('mouseenter', () => playBlip(300));
+});
