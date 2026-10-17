@@ -6,21 +6,19 @@
     <title>RisaToys — Patio de Juegos Digital</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a10'/><rect x='20' y='10' width='60' height='80' fill='%23ffd000' stroke='%23000' stroke-width='4'/><rect x='30' y='20' width='40' height='30' fill='%2300f0ff' stroke='%23000' stroke-width='3'/><rect x='30' y='60' width='16' height='6' fill='%23000'/><rect x='35' y='55' width='6' height='16' fill='%23000'/><circle cx='60' cy='68' r='5' fill='%23ff2a85' stroke='%23000' stroke-width='2'/><circle cx='70' cy='60' r='5' fill='%2300ff66' stroke='%23000' stroke-width='2'/></svg>">
     
-    <!-- Fuentes Retro & Monospace -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- Hoja de Estilos -->
     <link rel="stylesheet" href="styles.css">
 
-    <!-- Librerías Externas (Matter.js para físicas y Tone.js para efectos de sonido) -->
+    <!-- LIBRERÍAS EXTERNAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 <body>
 
-    <!-- 1. PANTALLA DE BIENVENIDA / MINIJUEGO INICIAL -->
+    <!-- PANTALLA DE BIENVENIDA CON JUEGO -->
     <div id="welcome-screen">
         <div class="welcome-top">
             <span class="welcome-badge">SYSTEM READY</span>
@@ -38,11 +36,11 @@
         </button>
     </div>
 
-    <!-- 2. CAPAS DE FONDO INTERACTIVO -->
+    <!-- FONDOS INTERACTIVOS -->
     <canvas id="stardust-canvas"></canvas>
     <div id="physics-container"></div>
 
-    <!-- 3. CONTENIDO PRINCIPAL / PORTFOLIO -->
+    <!-- PORTFOLIO / PROYECTOS -->
     <main class="wrapper">
 
         <header class="site-header">
@@ -61,10 +59,8 @@
             </div>
         </header>
 
-        <!-- GRID DE TARJETAS DE PROYECTOS -->
         <section class="toybox-grid">
 
-            <!-- Proyecto 1: VALKYRIE-9 -->
             <article class="toy-card" data-color="yellow">
                 <div class="card-header">
                     <span class="toy-tag">THREE.JS / 3D</span>
@@ -80,7 +76,6 @@
                 </div>
             </article>
 
-            <!-- Proyecto 2: APEX -->
             <article class="toy-card" data-color="cyan">
                 <div class="card-header">
                     <span class="toy-tag">CANVAS 2D / FÍSICA</span>
@@ -96,7 +91,6 @@
                 </div>
             </article>
 
-            <!-- Proyecto 3: MISIÓN -->
             <article class="toy-card" data-color="pink">
                 <div class="card-header">
                     <span class="toy-tag">NASA APIS / DATOS</span>
@@ -112,7 +106,6 @@
                 </div>
             </article>
 
-            <!-- Proyecto 4: PRÓXIMAMENTE -->
             <article class="toy-card disabled" data-color="green">
                 <div class="card-header">
                     <span class="toy-tag">PRÓXIMAMENTE</span>
@@ -136,7 +129,6 @@
 
     </main>
 
-    <!-- Script Principal -->
     <script src="script.js"></script>
 </body>
 </html>
