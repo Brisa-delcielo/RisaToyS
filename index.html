@@ -5,23 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RisaToys</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a10'/><rect x='20' y='10' width='60' height='80' fill='%23ffd000' stroke='%23000' stroke-width='4'/><rect x='30' y='20' width='40' height='30' fill='%2300f0ff' stroke='%23000' stroke-width='3'/><rect x='30' y='60' width='16' height='6' fill='%23000'/><rect x='35' y='55' width='6' height='16' fill='%23000'/><circle cx='60' cy='68' r='5' fill='%23ff2a85' stroke='%23000' stroke-width='2'/><circle cx='70' cy='60' r='5' fill='%2300ff66' stroke='%23000' stroke-width='2'/></svg>">
+    
+    <!-- FUENTES RETRO Y MONOESPACIADAS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="./styles.css">
+
+    <!-- LIBRERÍAS EXTERNAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
 <body>
 
+    <!-- 1. PANTALLA RETRO DE BIENVENIDA / INTERACCIÓN INICIAL -->
     <div id="retro-welcome-screen">
         <div class="welcome-top">
             <span class="welcome-badge">SYSTEM READY</span>
             <span class="welcome-hint">HAZ CLIC O DEDO PARA DISPARAR 🎯</span>
         </div>
 
-        <h1 class="welcome-title">RisaToyS</h1>
+        <h1 class="welcome-title">RISATOYS</h1>
 
         <div class="intro-game-box">
             <canvas id="intro-canvas"></canvas>
@@ -32,6 +37,7 @@
         </button>
     </div>
 
+    <!-- 2. CONTENIDO PRINCIPAL Y FONDOS CON FÍSICAS -->
     <canvas id="stardust-canvas"></canvas>
     <div id="physics-container"></div>
 
@@ -53,8 +59,10 @@
             </div>
         </header>
 
+        <!-- SECCIÓN DE PROYECTOS / TARJETAS EN CUADRÍCULA -->
         <section class="toybox-grid">
 
+            <!-- VALKYRIE-9 -->
             <article class="toy-card" data-color="yellow">
                 <div class="card-header">
                     <span class="toy-tag">THREE.JS / 3D</span>
@@ -63,13 +71,14 @@
                 <div class="canvas-container">
                     <canvas id="mini-canvas-1"></canvas>
                 </div>
-                <h2>aeROX</h2>
+                <h2>VALKYRIE-9</h2>
                 <p>Visor tridimensional interactivo de una nave espacial en órbita con controles de cámara.</p>
                 <div class="card-actions">
                     <a href="https://brisa-delcielo.github.io/aeROX/" target="_blank" class="toy-link primary">JUGAR AHORA ↗</a>
                 </div>
             </article>
 
+            <!-- APEX -->
             <article class="toy-card" data-color="cyan">
                 <div class="card-header">
                     <span class="toy-tag">CANVAS 2D / FÍSICA</span>
@@ -85,6 +94,7 @@
                 </div>
             </article>
 
+            <!-- MISIÓN -->
             <article class="toy-card" data-color="pink">
                 <div class="card-header">
                     <span class="toy-tag">NASA APIS / DATOS</span>
@@ -100,6 +110,7 @@
                 </div>
             </article>
 
+            <!-- PRÓXIMAMENTE -->
             <article class="toy-card disabled" data-color="green">
                 <div class="card-header">
                     <span class="toy-tag">PRÓXIMAMENTE</span>
@@ -123,7 +134,8 @@
 
     </main>
 
-    <script src="script.js"></script>
-    <script src="intro.js"></script>
+    <!-- SCRIPTS MÓDULO PARA GITHUB PAGES -->
+    <script type="module" src="intro.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
