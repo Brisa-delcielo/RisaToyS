@@ -474,10 +474,11 @@ body {
     overflow: hidden;
 }
 
-#intro-canvas {
+.canvas-container canvas {
+    display: block;
     width: 100%;
     height: 100%;
-    display: block;
+}
 }
 
 .shoot-prompt-btn {
