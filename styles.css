@@ -379,22 +379,18 @@ body {
 .intro-game-box {
     width: 100%;
     max-width: 500px;
-    height: 320px;
+    height: 300px;
     background: #000;
     border: 4px solid #ffffff;
     box-shadow: 8px 8px 0px var(--color-pink);
     position: relative;
     overflow: hidden;
-}
-
-#intro-canvas {
-    width: 100%;
-    height: 100%;
-    display: block;
+    margin-bottom: 25px; /* Espacio extra para que no pise el botón */
 }
 
 .shoot-prompt-btn {
-    margin-top: 20px;
+    position: relative;
+    z-index: 10;
     font-family: var(--font-pixel);
     font-size: 0.75rem;
     background: var(--color-green);
@@ -405,7 +401,6 @@ body {
     box-shadow: 5px 5px 0px #000;
     animation: pulse-shoot 1.2s infinite ease-in-out;
 }
-
 .shoot-prompt-btn:hover {
     background: var(--color-yellow);
     transform: translate(-2px, -2px);
