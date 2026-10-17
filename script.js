@@ -1,7 +1,7 @@
 window.addEventListener('DOMContentLoaded', () => {
 
     // ==========================================
-    // 1. PANTALLA DE ENTRADA / MINIJUEGO INICIAL
+    // 1. MINIJUEGO PANTALLA DE ENTRADA & RUPTURA
     // ==========================================
     const introCanvas = document.getElementById('intro-canvas');
     const welcomeScreen = document.getElementById('welcome-screen');
@@ -9,9 +9,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     let targetX = 0, targetY = 0;
     let targetVx = 2.5, targetVy = 1.8;
-    let targetRadius = 22;
+    let targetRadius = 26;
     let targetAngle = 0;
     let isGameActive = true;
+    let explosionParticles = [];
 
     if (introCanvas) {
         const introCtx = introCanvas.getContext('2d');
@@ -31,69 +32,115 @@ window.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('resize', resizeIntroCanvas);
 
         function drawIntroGame() {
-            if (!isGameActive) return;
-
             introCtx.fillStyle = '#0a0a10';
             introCtx.fillRect(0, 0, introCanvas.width, introCanvas.height);
 
-            // Movimiento del objetivo
-            targetX += targetVx;
-            targetY += targetVy;
+            if (isGameActive) {
+                // Movimiento
+                targetX += targetVx;
+                targetY += targetVy;
 
-            if (targetX - targetRadius < 0 || targetX + targetRadius > introCanvas.width) targetVx *= -1;
-            if (targetY - targetRadius < 0 || targetY + targetRadius > introCanvas.height) targetVy *= -1;
+                if (targetX - targetRadius < 0 || targetX + targetRadius > introCanvas.width) targetVx *= -1;
+                if (targetY - targetRadius < 0 || targetY + targetRadius > introCanvas.height) targetVy *= -1;
 
-            // Dibujo de la nave / objetivo
-            introCtx.save();
-            introCtx.translate(targetX, targetY);
-            targetAngle += 0.03;
-            introCtx.rotate(targetAngle);
+                // Dibujar Objetivo
+                introCtx.save();
+                introCtx.translate(targetX, targetY);
+                targetAngle += 0.03;
+                introCtx.rotate(targetAngle);
 
-            // Anillo exterior
-            introCtx.strokeStyle = '#00f0ff';
-            introCtx.lineWidth = 3;
-            introCtx.beginPath();
-            introCtx.ellipse(0, 0, targetRadius + 10, targetRadius / 2.5, 0, 0, Math.PI * 2);
-            introCtx.stroke();
+                // Anillo exterior
+                introCtx.strokeStyle = '#00f0ff';
+                introCtx.lineWidth = 3;
+                introCtx.beginPath();
+                introCtx.ellipse(0, 0, targetRadius + 10, targetRadius / 2.5, 0, 0, Math.PI * 2);
+                introCtx.stroke();
 
-            // Núcleo
-            introCtx.fillStyle = '#ff2a85';
-            introCtx.beginPath();
-            introCtx.arc(0, 0, targetRadius, 0, Math.PI * 2);
-            introCtx.fill();
-            introCtx.strokeStyle = '#ffd000';
-            introCtx.lineWidth = 3;
-            introCtx.stroke();
+                // Núcleo
+                introCtx.fillStyle = '#ff2a85';
+                introCtx.beginPath();
+                introCtx.arc(0, 0, targetRadius, 0, Math.PI * 2);
+                introCtx.fill();
+                introCtx.strokeStyle = '#ffd000';
+                introCtx.lineWidth = 3;
+                introCtx.stroke();
 
-            introCtx.restore();
+                introCtx.restore();
+            } else {
+                // Animar partículas de explosión
+                for (let i = explosionParticles.length - 1; i >= 0; i--) {
+                    let p = explosionParticles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.03;
+
+                    introCtx.fillStyle = p.color;
+                    introCtx.globalAlpha = Math.max(p.alpha, 0);
+                    introCtx.fillRect(p.x, p.y, p.size, p.size);
+                    introCtx.globalAlpha = 1.0;
+
+                    if (p.alpha <= 0) explosionParticles.splice(i, 1);
+                }
+            }
 
             requestAnimationFrame(drawIntroGame);
         }
 
         drawIntroGame();
 
-        function triggerShatter() {
-            if (!isGameActive) return;
-            isGameActive = false;
-
-            if (welcomeScreen) {
-                welcomeScreen.classList.add('hidden');
+        function createExplosion(x, y) {
+            explosionParticles = [];
+            const colors = ['#ffd000', '#ff2a85', '#00f0ff', '#ffffff'];
+            for (let i = 0; i < 40; i++) {
+                explosionParticles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    size: Math.random() * 8 + 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    alpha: 1.0
+                });
             }
         }
 
+        function triggerShatter(clickX, clickY) {
+            if (!isGameActive) return;
+            isGameActive = false;
+
+            const explodeX = clickX || targetX;
+            const explodeY = clickY || targetY;
+
+            playPop();
+            createExplosion(explodeX, explodeY);
+
+            if (welcomeScreen) {
+                setTimeout(() => {
+                    welcomeScreen.classList.add('shatter-effect');
+                }, 200);
+
+                setTimeout(() => {
+                    welcomeScreen.classList.add('hidden');
+                }, 800);
+            }
+        }
+
+        // Disparo por clic o toque directo en todo el canvas
         introCanvas.addEventListener('click', (e) => {
             const rect = introCanvas.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             const clickY = e.clientY - rect.top;
 
-            const dist = Math.hypot(clickX - targetX, clickY - targetY);
-            if (dist <= targetRadius + 20) {
-                triggerShatter();
-            }
+            // Al hacer clic dentro del contenedor, dispara y destruye el objetivo
+            triggerShatter(clickX, clickY);
         });
 
+        // Disparo por botón inferior
         if (shootBtn) {
-            shootBtn.addEventListener('click', triggerShatter);
+            shootBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                triggerShatter();
+            });
         }
     }
 
@@ -151,7 +198,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. FONDO: POLVO DE ESTRELLAS (STARDUST)
+    // 3. FONDO: POLVO DE ESTRELLAS
     // ==========================================
     const starCanvas = document.getElementById('stardust-canvas');
     if (starCanvas) {
@@ -253,7 +300,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 4. FONDO: FÍSICAS CON MATTER.JS
+    // 4. FONDO: FÍSICAS (MATTER.JS)
     // ==========================================
     if (typeof Matter !== 'undefined') {
         const Engine = Matter.Engine,
@@ -354,7 +401,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 5. ANIMACIONES DE LAS TARJETAS
+    // 5. CANVASES DE PREVISUALIZACIÓN DE TARJETAS
     // ==========================================
     const c1 = document.getElementById('preview-canvas-1');
     const c2 = document.getElementById('preview-canvas-2');
