@@ -83,8 +83,96 @@ body {
 
 #welcome-screen.hidden {
     opacity: 0;
-    visibility: hidden;
+    v:root {
+    --bg-dark: #0a0a10;
+    --card-bg: #12121c;
+    --border-color: #262638;
+    --text-primary: #ffffff;
+    --text-muted: #a0a0b8;
+    
+    --color-yellow: #ffd000;
+    --color-cyan: #00f0ff;
+    --color-pink: #ff2a85;
+    --color-green: #00ff66;
+
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border-radius: 0 !important;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* CANVASES DE FONDO */
+#stardust-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
     pointer-events: none;
+    z-index: 1;
+}
+
+#physics-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: auto;
+    z-index: 2;
+    overflow: hidden;
+}
+
+#physics-container canvas {
+    display: block;
+    background: transparent !important;
+}
+
+/* PANTALLA DE BIENVENIDA */
+#welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-dark);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#welcome-screen.shatter-effect {
+    opacity: 0;
+    transform: scale(1.08);
+    pointer-events: none;
+}
+
+#welcome-screen.hidden {
+    display: none !important;
 }
 
 .welcome-top {
@@ -133,6 +221,7 @@ body {
     position: relative;
     overflow: hidden;
     margin-bottom: 28px;
+    cursor: crosshair;
 }
 
 #intro-canvas {
@@ -181,7 +270,6 @@ body {
     pointer-events: auto;
 }
 
-/* CABECERA */
 .site-header {
     background: var(--card-bg);
     border: 3px solid var(--text-primary);
@@ -275,7 +363,6 @@ body {
     border-color: #000;
 }
 
-/* REJILLA DE TARJETAS */
 .toybox-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -419,7 +506,6 @@ body {
     color: var(--text-muted);
 }
 
-/* RESPONSIVE MÓVIL */
 @media (max-width: 768px) {
     .wrapper {
         padding: 20px 12px 50px 12px;
