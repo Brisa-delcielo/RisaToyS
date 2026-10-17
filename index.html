@@ -21,7 +21,7 @@
             <span class="welcome-hint">HAZ CLIC O DEDO PARA DISPARAR 🎯</span>
         </div>
 
-        <h1 class="welcome-title">RISATOYS</h1>
+        <h1 class="welcome-title">RisaToyS</h1>
 
         <div class="intro-game-box">
             <canvas id="intro-canvas"></canvas>
@@ -32,7 +32,6 @@
         </button>
     </div>
 
-    <!-- 2. CONTENIDO PRINCIPAL -->
     <canvas id="stardust-canvas"></canvas>
     <div id="physics-container"></div>
 
@@ -56,7 +55,6 @@
 
         <section class="toybox-grid">
 
-            <!-- TARJETA 1 -->
             <article class="toy-card" data-color="yellow">
                 <div class="card-header">
                     <span class="toy-tag">THREE.JS / 3D</span>
@@ -65,14 +63,13 @@
                 <div class="canvas-container">
                     <canvas id="mini-canvas-1"></canvas>
                 </div>
-                <h2>VALKYRIE-9</h2>
+                <h2>aeROX</h2>
                 <p>Visor tridimensional interactivo de una nave espacial en órbita con controles de cámara.</p>
                 <div class="card-actions">
                     <a href="https://brisa-delcielo.github.io/aeROX/" target="_blank" class="toy-link primary">JUGAR AHORA ↗</a>
                 </div>
             </article>
 
-            <!-- TARJETA 2 -->
             <article class="toy-card" data-color="cyan">
                 <div class="card-header">
                     <span class="toy-tag">CANVAS 2D / FÍSICA</span>
@@ -88,7 +85,6 @@
                 </div>
             </article>
 
-            <!-- TARJETA 3 -->
             <article class="toy-card" data-color="pink">
                 <div class="card-header">
                     <span class="toy-tag">NASA APIS / DATOS</span>
@@ -104,7 +100,6 @@
                 </div>
             </article>
 
-            <!-- TARJETA 4 -->
             <article class="toy-card disabled" data-color="green">
                 <div class="card-header">
                     <span class="toy-tag">PRÓXIMAMENTE</span>
@@ -128,265 +123,7 @@
 
     </main>
 
-    <script>
-        let soundEnabled = true;
-        let synth, noiseSynth;
-
-        function initAudio() {
-            if (!synth) {
-                synth = new Tone.Synth({
-                    oscillator: { type: "square" },
-                    envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
-                }).toDestination();
-                synth.volume.value = -12;
-
-                noiseSynth = new Tone.NoiseSynth({
-                    noise: { type: "white" },
-                    envelope: { attack: 0.005, decay: 0.05, sustain: 0 }
-                }).toDestination();
-                noiseSynth.volume.value = -18;
-            }
-        }
-
-        function playBlip(freq = 440) {
-            if (!soundEnabled) return;
-            initAudio();
-            if (Tone.context && Tone.context.state === 'running') {
-                synth.triggerAttackRelease(freq, "8n");
-            }
-        }
-
-        function playPop() {
-            if (!soundEnabled) return;
-            initAudio();
-            if (Tone.context && Tone.context.state === 'running') {
-                noiseSynth.triggerAttackRelease("16n");
-            }
-        }
-
-        document.getElementById('sound-toggle').addEventListener('click', () => {
-            soundEnabled = !soundEnabled;
-            const btn = document.getElementById('sound-toggle');
-            btn.innerHTML = soundEnabled ? '<span>🔊</span> AUDIO: ON' : '<span>🔇</span> AUDIO: OFF';
-            if (soundEnabled) playBlip(600);
-        });
-
-        const starCanvas = document.getElementById('stardust-canvas');
-        const starCtx = starCanvas.getContext('2d');
-        let particles = [];
-        let backgroundStars = [];
-
-        function resizeStarCanvas() {
-            starCanvas.width = window.innerWidth;
-            starCanvas.height = window.innerHeight;
-            
-            backgroundStars = [];
-            for(let i = 0; i < 60; i++) {
-                backgroundStars.push({
-                    x: Math.random() * starCanvas.width,
-                    y: Math.random() * starCanvas.height,
-                    size: Math.random() * 3 + 1,
-                    alpha: Math.random()
-                });
-            }
-        }
-        resizeStarCanvas();
-        window.addEventListener('resize', resizeStarCanvas);
-
-        class StardustParticle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.size = Math.floor(Math.random() * 8) + 4;
-                this.vx = (Math.random() - 0.5) * 4;
-                this.vy = (Math.random() - 0.5) * 4 - 1;
-                this.colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66', '#ffffff'];
-                this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
-                this.life = 1.0;
-                this.decay = Math.random() * 0.03 + 0.015;
-                this.shape = Math.random() > 0.5 ? 'square' : 'cross';
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life -= this.decay;
-            }
-
-            draw() {
-                starCtx.save();
-                starCtx.fillStyle = this.color;
-                starCtx.globalAlpha = Math.max(this.life, 0);
-
-                if (this.shape === 'square') {
-                    starCtx.fillRect(this.x, this.y, this.size, this.size);
-                } else {
-                    const s = this.size;
-                    starCtx.fillRect(this.x - s/2, this.y - s/6, s, s/3);
-                    starCtx.fillRect(this.x - s/6, this.y - s/2, s/3, s);
-                }
-                starCtx.restore();
-            }
-        }
-
-        function addDust(x, y, count = 2) {
-            for (let i = 0; i < count; i++) {
-                particles.push(new StardustParticle(x, y));
-            }
-        }
-
-        window.addEventListener('mousemove', (e) => addDust(e.clientX, e.clientY, 2));
-        window.addEventListener('touchmove', (e) => {
-            if(e.touches[0]) addDust(e.touches[0].clientX, e.touches[0].clientY, 3);
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-                playPop();
-                addDust(e.clientX, e.clientY, 20);
-            }
-        });
-
-        function animateStardust() {
-            starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
-            
-            starCtx.fillStyle = "#ffffff";
-            backgroundStars.forEach(star => {
-                star.alpha += (Math.random() - 0.5) * 0.05;
-                if(star.alpha < 0.2) star.alpha = 0.2;
-                if(star.alpha > 1) star.alpha = 1;
-                starCtx.globalAlpha = star.alpha;
-                starCtx.fillRect(star.x, star.y, star.size, star.size);
-            });
-
-            for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].life <= 0) particles.splice(i, 1);
-            }
-            requestAnimationFrame(animateStardust);
-        }
-        animateStardust();
-
-        const Engine = Matter.Engine,
-              Render = Matter.Render,
-              World = Matter.World,
-              Bodies = Matter.Bodies,
-              Mouse = Matter.Mouse,
-              MouseConstraint = Matter.MouseConstraint;
-
-        const engine = Engine.create();
-        engine.world.gravity.y = 0.8;
-
-        const container = document.getElementById('physics-container');
-        const render = Render.create({
-            element: container,
-            engine: engine,
-            options: {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                wireframes: false,
-                background: 'transparent' 
-            }
-        });
-
-        let ground, leftWall, rightWall;
-
-        function updateBounds() {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            
-            if (ground) World.remove(engine.world, [ground, leftWall, rightWall]);
-
-            ground = Bodies.rectangle(w / 2, h + 30, w * 2, 60, { isStatic: true });
-            leftWall = Bodies.rectangle(-30, h / 2, 60, h * 2, { isStatic: true });
-            rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 2, { isStatic: true });
-
-            World.add(engine.world, [ground, leftWall, rightWall]);
-            render.canvas.width = w;
-            render.canvas.height = h;
-        }
-
-        updateBounds();
-        window.addEventListener('resize', updateBounds);
-
-        const mouse = Mouse.create(render.canvas);
-        const mouseConstraint = MouseConstraint.create(engine, {
-            mouse: mouse,
-            constraint: { stiffness: 0.2, render: { visible: false } }
-        });
-        World.add(engine.world, mouseConstraint);
-
-        Matter.Runner.run(engine);
-        Render.run(render);
-
-        const colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66'];
-        let toys = [];
-
-        function spawnToy() {
-            playBlip(523.25);
-            const x = Math.random() * (window.innerWidth - 100) + 50;
-            const size = Math.floor(Math.random() * 18) + 22;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const shapes = ['box', 'circle', 'polygon'];
-            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
-
-            let body;
-            const options = {
-                restitution: 0.8,
-                friction: 0.05,
-                render: { fillStyle: color, strokeStyle: '#000000', lineWidth: 3 }
-            };
-
-            if (shapeType === 'box') {
-                body = Bodies.rectangle(x, -50, size * 1.5, size * 1.5, options);
-            } else if (shapeType === 'circle') {
-                body = Bodies.circle(x, -50, size, options);
-            } else {
-                body = Bodies.polygon(x, -50, 5, size, options);
-            }
-
-            toys.push(body);
-            World.add(engine.world, body);
-        }
-
-        document.getElementById('spawn-toy-btn').addEventListener('click', spawnToy);
-        document.getElementById('clear-toys-btn').addEventListener('click', () => {
-            playPop();
-            toys.forEach(toy => World.remove(engine.world, toy));
-            toys = [];
-        });
-
-        // =========================================================
-        // CORRECCIÓN DE LOS MINI CANVASES (TARJETAS DE PROYECTOS)
-        // =========================================================
-        const c1 = document.getElementById('mini-canvas-1');
-        const ctx1 = c1.getContext('2d');
-        const c2 = document.getElementById('mini-canvas-2');
-        const ctx2 = c2.getContext('2d');
-        const c3 = document.getElementById('mini-canvas-3');
-        const ctx3 = c3.getContext('2d');
-
-        function syncCanvasSizes() {
-            [c1, c2, c3].forEach(canvas => {
-                if (canvas && canvas.parentElement) {
-                    const rect = canvas.parentElement.getBoundingClientRect();
-                    const targetWidth = rect.width || 300;
-                    if (canvas.width !== targetWidth) {
-                        canvas.width = targetWidth;
-                    }
-                    if (canvas.height !== 120) {
-                        canvas.height = 120;
-                    }
-                }
-            });
-        }
-
-        // Sincronizar inmediatamente y al cambiar ventana
-        window.addEventListener('resize', syncCanvasSizes);
-        setTimeout(syncCanvasSizes, 50);
-
-        // Canvas 1: VALKYRIE-9
-        let angle1 = 0;
-        function drawCanvas1() {
-            syncCanvasSizes
+    <script src="script.js"></script>
+    <script src="intro.js"></script>
+</body>
+</html>
