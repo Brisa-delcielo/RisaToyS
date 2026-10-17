@@ -1,480 +1,461 @@
-// ==========================================
-// 1. MINIJUEGO DE LA PANTALLA DE ENTRADA
-// ==========================================
-const introCanvas = document.getElementById('intro-canvas');
-if (introCanvas) {
-    const introCtx = introCanvas.getContext('2d');
-    const shootBtn = document.getElementById('shoot-trigger-btn');
-    const welcomeScreen = document.getElementById('retro-welcome-screen');
+:root {
+    --bg-dark: #0a0a10;
+    --card-bg: #12121c;
+    --border-color: #262638;
+    --text-primary: #ffffff;
+    --text-muted: #a0a0b8;
+    
+    --color-yellow: #ffd000;
+    --color-cyan: #00f0ff;
+    --color-pink: #ff2a85;
+    --color-green: #00ff66;
 
-    let targetX = 0;
-    let targetY = 0;
-    let targetVx = 2.8;
-    let targetVy = 2.0;
-    let targetRadius = 22;
-    let targetAngle = 0;
-    let isShattered = false;
-
-    function setupIntroCanvas() {
-        if (!introCanvas.parentElement) return;
-        introCanvas.width = introCanvas.parentElement.clientWidth || 400;
-        introCanvas.height = introCanvas.parentElement.clientHeight || 280;
-
-        if (targetX === 0 && targetY === 0) {
-            targetX = introCanvas.width / 2;
-            targetY = introCanvas.height / 2;
-        }
-    }
-
-    setupIntroCanvas();
-    window.addEventListener('resize', setupIntroCanvas);
-
-    function animateIntro() {
-        if (isShattered) return;
-
-        introCtx.fillStyle = '#0a0a10';
-        introCtx.fillRect(0, 0, introCanvas.width, introCanvas.height);
-
-        targetX += targetVx;
-        targetY += targetVy;
-
-        if (targetX - targetRadius < 0 || targetX + targetRadius > introCanvas.width) targetVx *= -1;
-        if (targetY - targetRadius < 0 || targetY + targetRadius > introCanvas.height) targetVy *= -1;
-
-        introCtx.save();
-        introCtx.translate(targetX, targetY);
-        targetAngle += 0.03;
-        introCtx.rotate(targetAngle);
-
-        // Anillo giratorio (Planeta / Nave)
-        introCtx.strokeStyle = '#00f0ff';
-        introCtx.lineWidth = 3;
-        introCtx.beginPath();
-        introCtx.ellipse(0, 0, targetRadius + 10, targetRadius / 2.5, 0, 0, Math.PI * 2);
-        introCtx.stroke();
-
-        // Núcleo
-        introCtx.fillStyle = '#ff2a85';
-        introCtx.beginPath();
-        introCtx.arc(0, 0, targetRadius, 0, Math.PI * 2);
-        introCtx.fill();
-        introCtx.strokeStyle = '#ffd000';
-        introCtx.lineWidth = 3;
-        introCtx.stroke();
-
-        introCtx.restore();
-
-        requestAnimationFrame(animateIntro);
-    }
-
-    animateIntro();
-
-    function triggerShatter() {
-        if (isShattered) return;
-        isShattered = true;
-
-        if (welcomeScreen) {
-            welcomeScreen.classList.add('shattering');
-            setTimeout(() => {
-                welcomeScreen.style.display = 'none';
-            }, 500);
-        }
-    }
-
-    introCanvas.addEventListener('click', (e) => {
-        const rect = introCanvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-
-        const dist = Math.hypot(clickX - targetX, clickY - targetY);
-        if (dist <= targetRadius + 20) triggerShatter();
-    });
-
-    if (shootBtn) {
-        shootBtn.addEventListener('click', triggerShatter);
-    }
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
 }
 
-// ==========================================
-// 2. GESTIÓN DE AUDIO (TONE.JS)
-// ==========================================
-let soundEnabled = true;
-let synth, noiseSynth;
-
-function initAudio() {
-    if (!synth && typeof Tone !== 'undefined') {
-        synth = new Tone.Synth({
-            oscillator: { type: "square" },
-            envelope: { attack: 0.01, decay: 0.1, sustain: 0, release: 0.1 }
-        }).toDestination();
-        synth.volume.value = -12;
-
-        noiseSynth = new Tone.NoiseSynth({
-            noise: { type: "white" },
-            envelope: { attack: 0.005, decay: 0.05, sustain: 0 }
-        }).toDestination();
-        noiseSynth.volume.value = -18;
-    }
+/* RESET CONTROLADO CON BORDES RECTOS RETRO */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border-radius: 0 !important;
 }
 
-window.addEventListener('click', async () => {
-    if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state !== 'running') {
-        await Tone.start();
-    }
-}, { once: true });
-
-function playBlip(freq = 440) {
-    if (!soundEnabled) return;
-    initAudio();
-    if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'running') {
-        synth.triggerAttackRelease(freq, "8n");
-    }
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-function playPop() {
-    if (!soundEnabled) return;
-    initAudio();
-    if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state === 'running') {
-        noiseSynth.triggerAttackRelease("16n");
-    }
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    position: relative;
+    -webkit-font-smoothing: antialiased;
 }
 
-const soundBtn = document.getElementById('sound-toggle');
-if (soundBtn) {
-    soundBtn.addEventListener('click', () => {
-        soundEnabled = !soundEnabled;
-        soundBtn.innerHTML = soundEnabled ? '<span>🔊</span> AUDIO: ON' : '<span>🔇</span> AUDIO: OFF';
-        if (soundEnabled) playBlip(600);
-    });
+/* CANVASES DE FONDO */
+#stardust-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
 }
 
-// ==========================================
-// 3. FONDO INTERACTIVO: POLVO DE ESTRELLAS
-// ==========================================
-const starCanvas = document.getElementById('stardust-canvas');
-if (starCanvas) {
-    const starCtx = starCanvas.getContext('2d');
-    let particles = [];
-    let backgroundStars = [];
-
-    function resizeStarCanvas() {
-        starCanvas.width = window.innerWidth;
-        starCanvas.height = window.innerHeight;
-        
-        backgroundStars = [];
-        for(let i = 0; i < 60; i++) {
-            backgroundStars.push({
-                x: Math.random() * starCanvas.width,
-                y: Math.random() * starCanvas.height,
-                size: Math.random() * 3 + 1,
-                alpha: Math.random()
-            });
-        }
-    }
-    resizeStarCanvas();
-    window.addEventListener('resize', resizeStarCanvas);
-
-    class StardustParticle {
-        constructor(x, y) {
-            this.x = x;
-            this.y = y;
-            this.size = Math.floor(Math.random() * 8) + 4;
-            this.vx = (Math.random() - 0.5) * 4;
-            this.vy = (Math.random() - 0.5) * 4 - 1;
-            this.colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66', '#ffffff'];
-            this.color = this.colors[Math.floor(Math.random() * this.colors.length)];
-            this.life = 1.0;
-            this.decay = Math.random() * 0.03 + 0.015;
-            this.shape = Math.random() > 0.5 ? 'square' : 'cross';
-        }
-
-        update() {
-            this.x += this.vx;
-            this.y += this.vy;
-            this.life -= this.decay;
-        }
-
-        draw() {
-            starCtx.save();
-            starCtx.fillStyle = this.color;
-            starCtx.globalAlpha = Math.max(this.life, 0);
-
-            if (this.shape === 'square') {
-                starCtx.fillRect(this.x, this.y, this.size, this.size);
-            } else {
-                const s = this.size;
-                starCtx.fillRect(this.x - s/2, this.y - s/6, s, s/3);
-                starCtx.fillRect(this.x - s/6, this.y - s/2, s/3, s);
-            }
-            starCtx.restore();
-        }
-    }
-
-    function addDust(x, y, count = 2) {
-        for (let i = 0; i < count; i++) {
-            particles.push(new StardustParticle(x, y));
-        }
-    }
-
-    window.addEventListener('mousemove', (e) => addDust(e.clientX, e.clientY, 2));
-    window.addEventListener('touchmove', (e) => {
-        if(e.touches[0]) addDust(e.touches[0].clientX, e.touches[0].clientY, 3);
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
-            playPop();
-            addDust(e.clientX, e.clientY, 20);
-        }
-    });
-
-    function animateStardust() {
-        starCtx.clearRect(0, 0, starCanvas.width, starCanvas.height);
-        
-        starCtx.fillStyle = "#ffffff";
-        backgroundStars.forEach(star => {
-            star.alpha += (Math.random() - 0.5) * 0.05;
-            if(star.alpha < 0.2) star.alpha = 0.2;
-            if(star.alpha > 1) star.alpha = 1;
-            starCtx.globalAlpha = star.alpha;
-            starCtx.fillRect(star.x, star.y, star.size, star.size);
-        });
-
-        for (let i = particles.length - 1; i >= 0; i--) {
-            particles[i].update();
-            particles[i].draw();
-            if (particles[i].life <= 0) particles.splice(i, 1);
-        }
-        requestAnimationFrame(animateStardust);
-    }
-    animateStardust();
+#physics-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: auto;
+    z-index: 2;
+    overflow: hidden;
 }
 
-// ==========================================
-// 4. FONDO INTERACTIVO: FÍSICAS (MATTER.JS)
-// ==========================================
-if (typeof Matter !== 'undefined') {
-    const Engine = Matter.Engine,
-          Render = Matter.Render,
-          World = Matter.World,
-          Bodies = Matter.Bodies,
-          Mouse = Matter.Mouse,
-          MouseConstraint = Matter.MouseConstraint;
-
-    const engine = Engine.create();
-    engine.world.gravity.y = 0.8;
-
-    const container = document.getElementById('physics-container');
-    if (container) {
-        const render = Render.create({
-            element: container,
-            engine: engine,
-            options: {
-                width: window.innerWidth,
-                height: window.innerHeight,
-                wireframes: false,
-                background: 'transparent' 
-            }
-        });
-
-        let ground, leftWall, rightWall;
-
-        function updateBounds() {
-            const w = window.innerWidth;
-            const h = window.innerHeight;
-            
-            if (ground) World.remove(engine.world, [ground, leftWall, rightWall]);
-
-            ground = Bodies.rectangle(w / 2, h + 30, w * 2, 60, { isStatic: true });
-            leftWall = Bodies.rectangle(-30, h / 2, 60, h * 2, { isStatic: true });
-            rightWall = Bodies.rectangle(w + 30, h / 2, 60, h * 2, { isStatic: true });
-
-            World.add(engine.world, [ground, leftWall, rightWall]);
-            render.canvas.width = w;
-            render.canvas.height = h;
-        }
-
-        updateBounds();
-        window.addEventListener('resize', updateBounds);
-
-        const mouse = Mouse.create(render.canvas);
-        const mouseConstraint = MouseConstraint.create(engine, {
-            mouse: mouse,
-            constraint: { stiffness: 0.2, render: { visible: false } }
-        });
-        World.add(engine.world, mouseConstraint);
-
-        Matter.Runner.run(engine);
-        Render.run(render);
-
-        const colors = ['#ffd000', '#00f0ff', '#ff2a85', '#00ff66'];
-        let toys = [];
-
-        function spawnToy() {
-            playBlip(523.25);
-            const x = Math.random() * (window.innerWidth - 100) + 50;
-            const size = Math.floor(Math.random() * 18) + 22;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const shapes = ['box', 'circle', 'polygon'];
-            const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
-
-            let body;
-            const options = {
-                restitution: 0.8,
-                friction: 0.05,
-                render: { fillStyle: color, strokeStyle: '#000000', lineWidth: 3 }
-            };
-
-            if (shapeType === 'box') {
-                body = Bodies.rectangle(x, -50, size * 1.5, size * 1.5, options);
-            } else if (shapeType === 'circle') {
-                body = Bodies.circle(x, -50, size, options);
-            } else {
-                body = Bodies.polygon(x, -50, 5, size, options);
-            }
-
-            toys.push(body);
-            World.add(engine.world, body);
-        }
-
-        const spawnBtn = document.getElementById('spawn-toy-btn');
-        if (spawnBtn) spawnBtn.addEventListener('click', spawnToy);
-
-        const clearBtn = document.getElementById('clear-toys-btn');
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => {
-                playPop();
-                toys.forEach(toy => World.remove(engine.world, toy));
-                toys = [];
-            });
-        }
-    }
+#physics-container canvas {
+    display: block;
+    background: transparent !important;
 }
 
-// ==========================================
-// 5. ANIMACIÓN DE MINI CANVASES (PROYECTOS)
-// ==========================================
-const c1 = document.getElementById('mini-canvas-1');
-const c2 = document.getElementById('mini-canvas-2');
-const c3 = document.getElementById('mini-canvas-3');
-
-if (c1 && c2 && c3) {
-    const ctx1 = c1.getContext('2d');
-    const ctx2 = c2.getContext('2d');
-    const ctx3 = c3.getContext('2d');
-
-    function updateMiniCanvasDimensions() {
-        [c1, c2, c3].forEach(canvas => {
-            if (canvas && canvas.parentElement) {
-                const width = canvas.parentElement.clientWidth || 300;
-                if (canvas.width !== width) canvas.width = width;
-                canvas.height = 120;
-            }
-        });
-    }
-
-    window.addEventListener('resize', updateMiniCanvasDimensions);
-
-    // VALKYRIE-9
-    let angle1 = 0;
-    function drawCanvas1() {
-        updateMiniCanvasDimensions();
-        const w = c1.width || 300;
-        ctx1.clearRect(0, 0, w, 120);
-
-        ctx1.fillStyle = '#080810';
-        ctx1.fillRect(0, 0, w, 120);
-
-        ctx1.save();
-        ctx1.translate(w/2, 60);
-        ctx1.rotate(0.3);
-        ctx1.strokeStyle = '#ffd000';
-        ctx1.lineWidth = 4;
-        ctx1.beginPath();
-        ctx1.ellipse(0, 0, 38, 12, 0, 0, Math.PI * 2);
-        ctx1.stroke();
-        ctx1.restore();
-
-        ctx1.fillStyle = '#ff2a85';
-        ctx1.beginPath();
-        ctx1.arc(w/2, 60, 20, 0, Math.PI * 2);
-        ctx1.fill();
-        ctx1.lineWidth = 3;
-        ctx1.strokeStyle = '#000';
-        ctx1.stroke();
-
-        angle1 += 0.03;
-        const px = w/2 + Math.cos(angle1) * 15;
-        const py = 60 + Math.sin(angle1) * 6;
-        ctx1.fillStyle = '#ffffff';
-        ctx1.fillRect(px - 2, py - 2, 4, 4);
-
-        requestAnimationFrame(drawCanvas1);
-    }
-    drawCanvas1();
-
-    // APEX
-    let bx = 30, by = 30, vx = 2.5, vy = 2;
-    function drawCanvas2() {
-        const w = c2.width || 300;
-        ctx2.clearRect(0, 0, w, 120);
-
-        ctx2.fillStyle = '#080810';
-        ctx2.fillRect(0, 0, w, 120);
-
-        bx += vx;
-        by += vy;
-
-        if (bx < 15 || bx > w - 15) vx *= -1;
-        if (by < 15 || by > 105) vy *= -1;
-
-        ctx2.fillStyle = '#00f0ff';
-        ctx2.fillRect(bx - 10, by - 10, 20, 20);
-        ctx2.strokeStyle = '#000000';
-        ctx2.lineWidth = 3;
-        ctx2.strokeRect(bx - 10, by - 10, 20, 20);
-
-        requestAnimationFrame(drawCanvas2);
-    }
-    drawCanvas2();
-
-    // MISIÓN
-    let radarAngle = 0;
-    function drawCanvas3() {
-        const w = c3.width || 300;
-        ctx3.clearRect(0, 0, w, 120);
-
-        ctx3.fillStyle = '#080810';
-        ctx3.fillRect(0, 0, w, 120);
-
-        ctx3.strokeStyle = '#00ff66';
-        ctx3.lineWidth = 2;
-        ctx3.beginPath();
-        ctx3.arc(w/2, 60, 38, 0, Math.PI * 2);
-        ctx3.arc(w/2, 60, 18, 0, Math.PI * 2);
-        ctx3.stroke();
-
-        radarAngle += 0.04;
-        ctx3.save();
-        ctx3.translate(w/2, 60);
-        ctx3.rotate(radarAngle);
-        ctx3.strokeStyle = '#00ff66';
-        ctx3.lineWidth = 2;
-        ctx3.beginPath();
-        ctx3.moveTo(0, 0);
-        ctx3.lineTo(38, 0);
-        ctx3.stroke();
-        ctx3.restore();
-
-        requestAnimationFrame(drawCanvas3);
-    }
-    drawCanvas3();
+/* PANTALLA DE BIENVENIDA / INTERACCIÓN INICIAL */
+#welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-dark);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-document.querySelectorAll('.toy-card:not(.disabled)').forEach(card => {
-    card.addEventListener('mouseenter', () => playBlip(300));
-});
-    .intro-game-box {
-        height: 260px;
+#welcome-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.welcome-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.welcome-badge {
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    color: var(--color-yellow);
+    background: #000;
+    padding: 6px 12px;
+    border: 2px solid var(--color-yellow);
+}
+
+.welcome-hint {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-cyan);
+    letter-spacing: 1px;
+}
+
+.welcome-title {
+    font-family: var(--font-heading);
+    font-size: 3.2rem;
+    font-weight: 900;
+    color: var(--color-yellow);
+    text-shadow: 4px 4px 0px var(--color-pink), 8px 8px 0px #000;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+}
+
+.intro-box {
+    width: 100%;
+    max-width: 500px;
+    height: 300px;
+    background: #000;
+    border: 4px solid #ffffff;
+    box-shadow: 8px 8px 0px var(--color-pink);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 28px;
+}
+
+#intro-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.shoot-btn {
+    position: relative;
+    z-index: 10;
+    font-family: var(--font-pixel);
+    font-size: 0.75rem;
+    background: var(--color-green);
+    color: #000;
+    border: 3px solid #000;
+    padding: 14px 24px;
+    cursor: pointer;
+    box-shadow: 5px 5px 0px #000;
+    animation: pulse-shoot 1.2s infinite ease-in-out;
+}
+
+.shoot-btn:hover {
+    background: var(--color-yellow);
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0px #000;
+}
+
+@keyframes pulse-shoot {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+/* CONTENEDOR PRINCIPAL */
+.wrapper {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px 24px;
+    pointer-events: none;
+}
+
+.wrapper * {
+    pointer-events: auto;
+}
+
+/* CABECERA */
+.site-header {
+    background: var(--card-bg);
+    border: 3px solid var(--text-primary);
+    padding: 32px;
+    margin-bottom: 36px;
+    box-shadow: 8px 8px 0px var(--color-pink);
+    width: 100%;
+}
+
+.header-top {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btn-retro {
+    font-family: var(--font-pixel);
+    font-size: 0.65rem;
+    background: #000;
+    color: var(--color-cyan);
+    border: 2px solid var(--color-cyan);
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-retro:hover {
+    background: var(--color-cyan);
+    color: #000;
+}
+
+.glitch-title {
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    color: var(--color-yellow);
+    text-shadow: 5px 5px 0px #000;
+    margin-bottom: 12px;
+    line-height: 1;
+}
+
+.hero-desc {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 28px;
+    max-width: 800px;
+}
+
+.controls-bar {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    font-family: var(--font-pixel);
+    font-size: 0.72rem;
+    padding: 14px 22px;
+    border: 3px solid #000;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.spawn-btn {
+    background: var(--color-green);
+    color: #000;
+    box-shadow: 5px 5px 0px #000;
+}
+
+.spawn-btn:hover {
+    background: #22ff88;
+    transform: translate(-2px, -2px);
+    box-shadow: 7px 7px 0px #000;
+}
+
+.clear-btn {
+    background: #222230;
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+    box-shadow: 5px 5px 0px #000;
+}
+
+.clear-btn:hover {
+    background: var(--color-pink);
+    color: #000;
+    border-color: #000;
+}
+
+/* REJILLA DE TARJETAS */
+.toybox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    width: 100%;
+}
+
+.toy-card {
+    background: var(--card-bg);
+    border: 3px solid var(--border-color);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 6px 6px 0px #000;
+    width: 100%;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toy-card[data-color="yellow"]:hover { border-color: var(--color-yellow); box-shadow: 8px 8px 0px var(--color-yellow); }
+.toy-card[data-color="cyan"]:hover { border-color: var(--color-cyan); box-shadow: 8px 8px 0px var(--color-cyan); }
+.toy-card[data-color="pink"]:hover { border-color: var(--color-pink); box-shadow: 8px 8px 0px var(--color-pink); }
+.toy-card[data-color="green"]:hover { border-color: var(--color-green); box-shadow: 8px 8px 0px var(--color-green); }
+
+.toy-card:hover {
+    transform: translateY(-4px);
+}
+
+.toy-card.disabled {
+    opacity: 0.6;
+    border-style: dashed;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.toy-tag {
+    font-family: var(--font-pixel);
+    font-size: 0.58rem;
+    color: var(--text-muted);
+}
+
+.toy-badge {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: bold;
+    background: var(--color-green);
+    color: #000;
+    padding: 3px 8px;
+    border: 1px solid #000;
+}
+
+.toy-badge.outline {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border-color);
+}
+
+.canvas-preview {
+    width: 100%;
+    height: 120px;
+    background: #080810;
+    border: 2px solid #000;
+    margin-bottom: 18px;
+    overflow: hidden;
+}
+
+.canvas-preview canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.placeholder-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.toy-card h2 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+}
+
+.toy-card p {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 22px;
+}
+
+.card-actions {
+    margin-top: auto;
+}
+
+.toy-link {
+    display: block;
+    text-align: center;
+    font-family: var(--font-pixel);
+    font-size: 0.68rem;
+    padding: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    border: 2px solid #000;
+    transition: all 0.15s ease;
+}
+
+.toy-link.primary {
+    background: var(--color-yellow);
+    color: #000;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.toy-link.primary:hover {
+    background: #ffffff;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #000;
+}
+
+.toy-link.disabled {
+    background: #222230;
+    color: var(--text-muted);
+    border-color: var(--border-color);
+    cursor: not-allowed;
+}
+
+.site-footer {
+    margin-top: 50px;
+    padding-top: 24px;
+    border-top: 2px solid var(--border-color);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* RESPONSIVE MÓVIL */
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 20px 12px 50px 12px;
+    }
+
+    .site-header {
+        padding: 20px 16px;
+        margin-bottom: 24px;
+        box-shadow: 5px 5px 0px var(--color-pink);
+    }
+
+    .glitch-title {
+        font-size: 2.2rem;
+    }
+
+    .controls-bar {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .btn-action {
+        width: 100%;
+        text-align: center;
+        font-size: 0.62rem;
+    }
+
+    .toybox-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .welcome-title {
+        font-size: 2rem;
+    }
+
+    .intro-box {
+        height: 250px;
     }
 }
